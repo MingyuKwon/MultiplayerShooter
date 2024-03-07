@@ -21,6 +21,13 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void Turn(float Value);
+	void Lookup(float Value);
+
+	void Jump();
+
 private:
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
 	class USpringArmComponent* CameraBoom;
