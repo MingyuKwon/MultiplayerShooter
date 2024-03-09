@@ -40,7 +40,7 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	FString Name = GetName();
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -129,12 +129,6 @@ void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
 	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, TEXT("IsLocallyControlled false"));
-
-	}
-
 
 }
 
