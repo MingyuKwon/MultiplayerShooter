@@ -114,25 +114,23 @@ void ABlasterCharacter::Jump()
 
 void ABlasterCharacter::EquipButtonPressed()
 {
-	if (IsLocallyControlled())
+	if (Combat)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, *FString("IsLocallyControlled() true"));
+		if (HasAuthority())
+		{
+			Combat->SetEquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
 	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, *FString("IsLocallyControlled() false"));
-	}
+}
 
-	if (HasAuthority())
-	{
-		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, *FString("HasAuthority() true"));
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, *FString("HasAuthority() false"));
-	}
 
-	if (Combat && HasAuthority())
+void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if (Combat)
 	{
 		Combat->SetEquipWeapon(OverlappingWeapon);
 	}

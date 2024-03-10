@@ -5,6 +5,7 @@
 #include "character/BlasterCharacter.h"
 #include "Weapon/Weapon.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Components/SphereComponent.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -42,6 +43,6 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 	}
 
 	EquippedWeapon->SetOwner(Character);
-	EquippedWeapon->ShowPickupWidget(false);
+
 }
 

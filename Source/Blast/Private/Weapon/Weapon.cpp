@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "character/BlasterCharacter.h"
+#include "Net/UnrealNetwork.h"
+
 
 
 AWeapon::AWeapon()
@@ -71,6 +73,35 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
+// 이건 서버측에서 실행 된 코드로 인해 state가 바뀌면 클라이언트에서 자동으로 불릴 함수
+void AWeapon::OnRep_WeaponState()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+
+	}
+}
+
+// 이건 서버 측에서 실행 될 코드
+void AWeapon::SetWeaponState(EWeaponState weaponState)
+{
+	WeaponState = weaponState;
+
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+
+	}
+
+}
+
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -83,5 +114,12 @@ void AWeapon::ShowPickupWidget(bool bShowWIdget)
 	{
 		PickUpWidget->SetVisibility(bShowWIdget);
 	}
+}
+
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AWeapon, WeaponState, COND_OwnerOnly)
 }
 
