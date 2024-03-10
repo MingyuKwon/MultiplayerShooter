@@ -31,6 +31,8 @@ protected:
 
 	void Jump();
 	void EquipButtonPressed();
+	void CrouchButtonPressed();
+	
 
 private:
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
