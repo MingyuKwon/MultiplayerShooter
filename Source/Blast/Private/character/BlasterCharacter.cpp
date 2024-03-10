@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
+#include "BlasterComponents/CombatComponent.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -27,6 +28,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverHead Widget"));
 	OverheadWidget->SetupAttachment(GetRootComponent());
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(FName("Combat Component"));
+	Combat->SetIsReplicated(true);
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -37,10 +41,20 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(ABlasterCharacter , OverlappingWeapon, COND_OwnerOnly);
 }
 
+void ABlasterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (Combat)
+	{
+		Combat->Character = this;
+	}
+
+}
+
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	FString Name = GetName();
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -54,6 +68,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction(FName("Jump"),EInputEvent::IE_Pressed ,this, &ABlasterCharacter::Jump);
+	PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::EquipButtonPressed);
 
 	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABlasterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(FName("MoveRight"), this, &ABlasterCharacter::MoveRight);
@@ -97,20 +112,30 @@ void ABlasterCharacter::Jump()
 	ACharacter::Jump();
 }
 
-void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+void ABlasterCharacter::EquipButtonPressed()
 {
-	// 이게 null이면 가리기가 안되는데
-	if (OverlappingWeapon)
+	if (IsLocallyControlled())
 	{
-		OverlappingWeapon->ShowPickupWidget(true);
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, *FString("IsLocallyControlled() true"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, *FString("IsLocallyControlled() false"));
 	}
 
-	// 이렇게 콜백에 last 넣어주면 null로 변형 된 후에도 접근이 가능
-	if (LastWeapon)
+	if (HasAuthority())
 	{
-		LastWeapon->ShowPickupWidget(false);
+		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, *FString("HasAuthority() true"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Blue, *FString("HasAuthority() false"));
 	}
 
+	if (Combat && HasAuthority())
+	{
+		Combat->SetEquipWeapon(OverlappingWeapon);
+	}
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
@@ -131,4 +156,22 @@ void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}
 
 }
+
+void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	// 이게 null이면 가리기가 안되는데
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(true);
+	}
+
+	// 이렇게 콜백에 last 넣어주면 null로 변형 된 후에도 접근이 가능
+	if (LastWeapon)
+	{
+		LastWeapon->ShowPickupWidget(false);
+	}
+
+}
+
+
 

@@ -51,4 +51,7 @@ private:
 
 	UPROPERTY(EditAnyWhere)
 	class UWidgetComponent* PickUpWidget;
+
+public:
+	FORCEINLINE void SetWeaponState(EWeaponState weaponState) { WeaponState = weaponState; }
 };
