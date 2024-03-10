@@ -17,6 +17,8 @@ class BLAST_API UCombatComponent : public UActorComponent
 public:	
 	UCombatComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// 외부에서 모든 접근을 허용할 클래스
 	friend class ABlasterCharacter;
 
@@ -31,6 +33,8 @@ protected:
 private:
 
 	ABlasterCharacter* Character;
+
+	UPROPERTY(Replicated)
 	AWeapon* EquippedWeapon;
 
 };

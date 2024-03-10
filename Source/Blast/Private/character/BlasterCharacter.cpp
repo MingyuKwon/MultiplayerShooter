@@ -155,6 +155,11 @@ void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 
 }
 
+bool ABlasterCharacter::isWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
+}
+
 void ABlasterCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 	// 이게 null이면 가리기가 안되는데
