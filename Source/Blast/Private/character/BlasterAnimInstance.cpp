@@ -4,6 +4,7 @@
 #include "character/BlasterAnimInstance.h"
 #include "character/BlasterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UBlasterAnimInstance::NativeInitializeAnimation()
 {
@@ -32,4 +33,25 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bWeaponEquipped = BlasterCharacter->isWeaponEquipped();
 	bIsCrouched = BlasterCharacter->bIsCrouched;
 	bAiming = BlasterCharacter->IsAiming();
+
+	// offset yaw for strafing
+
+	// 이게 컨트롤러 가 보고있는, 즉 카메라가 보고 있는 정면의 rotation
+	FRotator AimRotation =  BlasterCharacter->GetBaseAimRotation();
+	// 지금 이동하는 방향을 월드 기준으로 rotation으로 바꿈
+	FRotator MovementeRotation = UKismetMathLibrary::MakeRotFromX(BlasterCharacter->GetVelocity());
+
+	// 이건 어떻게 보면 aim rotation을 기준으로 보고, 그 기준으로 봤을 떄 MovementeRotation가 어느정도 각도인지를 알아내는 것이다
+	YawOffset = UKismetMathLibrary::NormalizedDeltaRotator(MovementeRotation, AimRotation).Yaw;
+
+
+
+	CharacterRotationLastFrame = CharacterRotation;
+	CharacterRotation = BlasterCharacter->GetActorRotation();
+
+	const FRotator Delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame);
+	const float Target = Delta.Yaw / DeltaTime;
+	const float Interp = FMath::FInterpTo(Lean, Target, DeltaTime, 6.f);
+
+	Lean = FMath::Clamp(Interp , -90.f, 90.f);
 }
