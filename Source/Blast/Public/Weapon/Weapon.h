@@ -58,6 +58,7 @@ private:
 	void OnRep_WeaponState();
 
 public:
-	FORCEINLINE void SetWeaponState(EWeaponState weaponState);
+	void SetWeaponState(EWeaponState weaponState);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 };
