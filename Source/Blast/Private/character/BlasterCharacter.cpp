@@ -199,8 +199,19 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	}
 
 	// Pith는 이동과 별 상관이 없으므로 그냥 해도 됨
+	// 이 값이 서버로 갈 때 서버는 회전 각도를 0~360으로 처리하는 문제가 있다
+	// 우리는 ao-pitch의 값이 -90~90이라고 생각하고 애니메이션을 짰는데 서버로 전송되어서 압축 해제 된 값은 0~360이었던 것
 	AO_Pitch = GetBaseAimRotation().Pitch;
+	if (AO_Pitch > 90.f && !IsLocallyControlled())
+	{
+		// Map pitch from 9270 , 360) to [-90, 0)
+		FVector2D InRange(270.f, 360.f);
+		FVector2D OutRange(270.f, 360.f);
+		// 그래서 서버 측이면 0~360 범위라면 그 값을 다시 정정 시켜줘야 한다
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
+	}
 
+	//AO_Yaw 는 애초에 원래 있던 위치와 비교해서 각도를 정하니까 이런 문제가 없는데 pitch는 그냥 회전 값을 생으로 가져와서 사용해서 이런 문제가 생긴다
 }
 
 
