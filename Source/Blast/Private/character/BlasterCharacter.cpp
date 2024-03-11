@@ -206,7 +206,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	{
 		// Map pitch from 9270 , 360) to [-90, 0)
 		FVector2D InRange(270.f, 360.f);
-		FVector2D OutRange(270.f, 360.f);
+		FVector2D OutRange(-90.f, 0.f);
 		// 그래서 서버 측이면 0~360 범위라면 그 값을 다시 정정 시켜줘야 한다
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
