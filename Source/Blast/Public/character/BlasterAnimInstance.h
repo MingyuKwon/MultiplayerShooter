@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Blast/BlasterTypes/TurningInPlace.h"
+
 #include "BlasterAnimInstance.generated.h"
 
 /**
@@ -61,5 +63,9 @@ private:
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
 	FRotator DeltaRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
+	ETurningInPlace TurningInPlace;
+
 
 };
