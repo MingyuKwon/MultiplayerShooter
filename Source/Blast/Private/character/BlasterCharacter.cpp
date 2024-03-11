@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "BlasterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -66,7 +67,7 @@ void ABlasterCharacter::BeginPlay()
 void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	AimOffset(DeltaTime);
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -168,6 +169,38 @@ void ABlasterCharacter::AimButtonReleased()
 	{
 		Combat->SetAiming(false);
 	}
+}
+
+void ABlasterCharacter::AimOffset(float DeltaTime)
+{
+	if (Combat && Combat->EquippedWeapon == nullptr) return;
+
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	float speed = Velocity.Size();
+	bool bIsInAir = GetCharacterMovement()->IsFalling();
+
+	// 에임 오프셋은, 우리가 움직일 떄는 적용하지 않고 가만히 서있으면서 다른 방향을 조준 할 때 사용한다.
+	// 따라서 딱 멈췄을 떄 정면이 어디인지 계속 저장해 두고 ,멈춘 경우 현재 보고 있는 방향이 멈췄을 떄 방향과 얼마 정도 차이가 나는지를 계산해서 aimoffset 에게 인수로 줘야 한다
+
+	if (speed == 0.f && !bIsInAir) // Standing still, not jumping
+	{
+		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+		AO_Yaw = DeltaAimRotation.Yaw;
+		bUseControllerRotationYaw = false;
+		
+	}
+	else // running or jumping
+	{
+		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		AO_Yaw = 0.f;
+		bUseControllerRotationYaw = true;
+	}
+
+	// Pith는 이동과 별 상관이 없으므로 그냥 해도 됨
+	AO_Pitch = GetBaseAimRotation().Pitch;
+
 }
 
 
