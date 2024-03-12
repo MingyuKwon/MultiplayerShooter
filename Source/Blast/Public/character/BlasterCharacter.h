@@ -63,6 +63,7 @@ private:
 	void ServerEquipButtonPressed();
 
 	float AO_Yaw;
+	// 임계점에 도달해서 돌아야 할 떄는 -90까지 갔던 것이 0으로 (정면으로) 돌아가야 한다. 그떄 보간에 사용하기 위한 변수. 
 	float Interp_AO_Yaw;
 	float AO_Pitch;
 
