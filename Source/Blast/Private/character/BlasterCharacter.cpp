@@ -38,6 +38,8 @@ ABlasterCharacter::ABlasterCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 600.f);
+
 	TurningInPlace = ETurningInPlace::ERIP_NotTurning;
 
 	NetUpdateFrequency = 66.f;
@@ -124,7 +126,14 @@ void ABlasterCharacter::Lookup(float Value)
 
 void ABlasterCharacter::Jump()
 {
-	ACharacter::Jump();
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		ACharacter::Jump();
+	}
 }
 
 void ABlasterCharacter::EquipButtonPressed()
