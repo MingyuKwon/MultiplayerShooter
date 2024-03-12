@@ -46,10 +46,8 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	// 이건 어떻게 보면 aim rotation을 기준으로 보고, 그 기준으로 봤을 떄 MovementeRotation가 어느정도 각도인지를 알아내는 것이다
 	FRotator DeltaRot = UKismetMathLibrary::NormalizedDeltaRotator(MovementeRotation, AimRotation);
-	DeltaRotation = FMath::RInterpTo(DeltaRotation , DeltaRot, DeltaTime, 6.f);
+	DeltaRotation = FMath::RInterpTo(DeltaRotation , DeltaRot, DeltaTime, 10.f);
 	YawOffset = DeltaRotation.Yaw;
-
-	//YawOffset = UKismetMathLibrary::NormalizedDeltaRotator(MovementeRotation, AimRotation).Yaw;
 
 	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = BlasterCharacter->GetActorRotation();
