@@ -26,6 +26,8 @@ public:
 
 	void SetEquipWeapon(AWeapon* WeaponToEquip);
 
+	void FireButtonPressed(bool bPressed);
+
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
@@ -51,5 +53,9 @@ private:
 
 	UPROPERTY(EditAnyWhere)
 	float AimWalkSpeed;
+
+	bool bFireButtonpressed;
+
+
 
 };

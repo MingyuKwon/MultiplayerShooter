@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Weapon/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "character/BlasterAnimInstance.h"
 #include "BlasterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -65,6 +66,21 @@ void ABlasterCharacter::PostInitializeComponents()
 
 }
 
+void ABlasterCharacter::PlayFireMontage(bool bAiming)
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && FireWeaponMontage)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString("PlayFireMontage"));
+
+		animInstance->Montage_Play(FireWeaponMontage);
+		FName SectionName = bAiming ? FName("RifleHip") : FName("RifleAim");
+		animInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -85,6 +101,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction(FName("Crouch"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::CrouchButtonPressed);
 	PlayerInputComponent->BindAction(FName("Aim"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::AimButtonPressed);
 	PlayerInputComponent->BindAction(FName("Aim"), EInputEvent::IE_Released, this, &ABlasterCharacter::AimButtonReleased);
+	PlayerInputComponent->BindAction(FName("Fire"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::FireButtonPressed);
+	PlayerInputComponent->BindAction(FName("Fire"), EInputEvent::IE_Released, this, &ABlasterCharacter::FireButtonReleased);
 
 
 	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABlasterCharacter::MoveForward);
@@ -155,14 +173,10 @@ void ABlasterCharacter::CrouchButtonPressed()
 {
 	if (bIsCrouched)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, FString("CrouchButtonPressed bIsCrouched true"));
-
 		UnCrouch();
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString("CrouchButtonPressed bIsCrouched false"));
-
 		Crouch();
 	}
 	
@@ -181,6 +195,22 @@ void ABlasterCharacter::AimButtonReleased()
 	if (Combat)
 	{
 		Combat->SetAiming(false);
+	}
+}
+
+void ABlasterCharacter::FireButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->FireButtonPressed(true);
+	}
+}
+
+void ABlasterCharacter::FireButtonReleased()
+{
+	if (Combat)
+	{
+		Combat->FireButtonPressed(false);
 	}
 }
 
