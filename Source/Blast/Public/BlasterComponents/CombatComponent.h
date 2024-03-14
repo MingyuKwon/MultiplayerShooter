@@ -44,11 +44,11 @@ protected:
 
 	// 이건 어디에서 호출이 되도, 실제 실행을 서버 월드에서 실행함
 	UFUNCTION(Server, Reliable)
-	void ServerFire();
+	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
 	// 이건 클라이언트에서 호출 되면 그냥 자기 자신에서 실행이지만, 서버에서 호출시 서버와 모든 연결된 클라이언트에서 실행
 	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastFire();
+	void MultiCastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrossHair(FHitResult& OutResult);
 
@@ -69,7 +69,5 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonpressed;
-
-	FVector HitTarget;
 
 };
