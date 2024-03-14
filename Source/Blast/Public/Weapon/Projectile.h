@@ -18,6 +18,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Destroyed() override;
+
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit);
 
 private:
 	UPROPERTY(EditAnyWhere)
@@ -28,6 +32,12 @@ private:
 
 	UPROPERTY(EditAnyWhere)
 	UParticleSystem* Trace;
+
+	UPROPERTY(EditAnyWhere)
+	UParticleSystem* ImpactParticle;
+
+	UPROPERTY(EditAnyWhere)
+	class USoundCue* ImpactSound;
 
 	class UParticleSystemComponent* TraceComponent;
 
