@@ -23,6 +23,9 @@ private:
 	UPROPERTY(EditAnyWhere)
 	class UBoxComponent* CollisionBox;
 
+	UPROPERTY(VisibleAnyWhere)
+	class UProjectileMovementComponent* ProjectileMovementComponent;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
