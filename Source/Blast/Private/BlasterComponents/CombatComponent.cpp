@@ -72,7 +72,31 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
+void UCombatComponent::FireButtonPressed(bool bPressed)
+{
+	bFireButtonpressed = bPressed;
 
+	if (bFireButtonpressed)
+	{
+		ServerFire();
+	}
+
+}
+void UCombatComponent::ServerFire_Implementation()
+{
+	MultiCastFire();
+}
+
+void UCombatComponent::MultiCastFire_Implementation()
+{
+	if (EquippedWeapon == nullptr) return;
+
+	if (Character)
+	{
+		Character->PlayFireMontage(bAiming);
+		EquippedWeapon->Fire();
+	}
+}
 
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -103,16 +127,5 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 	Character->bUseControllerRotationYaw = true;
 }
 
-void UCombatComponent::FireButtonPressed(bool bPressed)
-{
-	bFireButtonpressed = bPressed;
 
-	if (EquippedWeapon == nullptr) return;
-
-	if (Character && bPressed)
-	{
-		Character->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire();
-	}
-}
 

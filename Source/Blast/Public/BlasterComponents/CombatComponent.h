@@ -38,6 +38,14 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	// 이건 어디에서 호출이 되도, 실제 실행을 서버 월드에서 실행함
+	UFUNCTION(Server, Reliable)
+	void ServerFire();
+
+	// 이건 클라이언트에서 호출 되면 그냥 자기 자신에서 실행이지만, 서버에서 호출시 서버와 모든 연결된 클라이언트에서 실행
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastFire();
+
 private:
 
 	ABlasterCharacter* Character;
