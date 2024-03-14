@@ -12,6 +12,7 @@ ACasing::ACasing()
 	CasingMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Static Mesh"));
 	SetRootComponent(CasingMesh);
 	CasingMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	CasingMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	CasingMesh->SetSimulatePhysics(true);
 	CasingMesh->SetEnableGravity(true);
 	// Hit은 rigidbody 와 관련해서 일어나기에 이거 설정 안하면 안된단
@@ -34,7 +35,7 @@ void ACasing::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitive
 		isHitSomeWhere = true;
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShellSound, GetActorLocation());
 	}
-	SetLifeSpan(0.5f);
+	SetLifeSpan(0.4f);
 }
 
 
