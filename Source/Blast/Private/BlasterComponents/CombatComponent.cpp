@@ -8,6 +8,8 @@
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFrameWork/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -72,6 +74,50 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	}
 }
 
+void UCombatComponent::TraceUnderCrossHair(FHitResult& OutResult)
+{
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	FVector2D ViewPortCentor(ViewportSize.X / 2, ViewportSize.Y / 2);
+	
+	FVector CrossHairLocation;
+	FVector CrossHairDirection;
+
+	bool bScreentoWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		ViewPortCentor,
+		CrossHairLocation,
+		CrossHairDirection
+	);
+
+
+	if (bScreentoWorld)
+	{
+		FVector Start = CrossHairLocation;
+		FVector End = Start + CrossHairDirection * TRACE_LENGTH;
+
+		GetWorld()->LineTraceSingleByChannel(
+			OutResult,
+			Start,
+			End,
+			ECollisionChannel::ECC_Visibility
+		);
+
+		if (!OutResult.bBlockingHit)
+		{
+			OutResult.ImpactPoint = End;
+		}
+		else
+		{
+			DrawDebugSphere(GetWorld() , OutResult.ImpactPoint, 12.f, 30 , FColor::Red);
+		}
+	}
+}
+
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonpressed = bPressed;
@@ -103,6 +149,8 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	FHitResult outResult;
+	TraceUnderCrossHair(outResult);
 }
 
 void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)

@@ -6,8 +6,12 @@
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 
+#define TRACE_LENGTH 80000
+
+
 class ABlasterCharacter;
 class AWeapon;
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLAST_API UCombatComponent : public UActorComponent
@@ -45,6 +49,8 @@ protected:
 	// 이건 클라이언트에서 호출 되면 그냥 자기 자신에서 실행이지만, 서버에서 호출시 서버와 모든 연결된 클라이언트에서 실행
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastFire();
+
+	void TraceUnderCrossHair(FHitResult& OutResult);
 
 private:
 
