@@ -117,7 +117,7 @@ void AWeapon::ShowPickupWidget(bool bShowWIdget)
 	}
 }
 
-void AWeapon::Fire()
+void AWeapon::Fire(const FVector& hitTarget)
 {
 	if (FireAnimation)
 	{

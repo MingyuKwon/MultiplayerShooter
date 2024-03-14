@@ -110,10 +110,12 @@ void UCombatComponent::TraceUnderCrossHair(FHitResult& OutResult)
 		if (!OutResult.bBlockingHit)
 		{
 			OutResult.ImpactPoint = End;
+			HitTarget = End;
 		}
 		else
 		{
 			DrawDebugSphere(GetWorld() , OutResult.ImpactPoint, 12.f, 30 , FColor::Red);
+			HitTarget = OutResult.ImpactPoint;
 		}
 	}
 }
@@ -140,7 +142,7 @@ void UCombatComponent::MultiCastFire_Implementation()
 	if (Character)
 	{
 		Character->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire();
+		EquippedWeapon->Fire(HitTarget);
 	}
 }
 
