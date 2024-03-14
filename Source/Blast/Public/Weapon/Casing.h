@@ -19,8 +19,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit);
+
+
 private:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* CasingMesh;
+
+	UPROPERTY(EditAnywhere)
+	float ShellEjectionImpulse;
+
+	UPROPERTY(EditAnyWhere)
+	class USoundCue* ShellSound;
+
+	bool isHitSomeWhere = false;
 
 };
