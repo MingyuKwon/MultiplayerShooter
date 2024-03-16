@@ -6,6 +6,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "character/BlasterCharacter.h"
+#include "Blast/Blast.h"
 
 // Sets default values
 AProjectile::AProjectile()
@@ -23,6 +25,8 @@ AProjectile::AProjectile()
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh, ECollisionResponse::ECR_Block);
+
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(FName("UProjectileMovementComponent"));
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
@@ -72,6 +76,12 @@ void AProjectile::Destroyed()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit)
 {
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(otherActor);
+	if (BlasterCharacter)
+	{
+		BlasterCharacter->MulticastHit();
+	}
+
 	// 내가 딱히 replicate 된 속성을 만들지 않더라도, replicate 선언된 액터가 죽으면 그게 모든 클라이언트 , 서버에 알려지게 되는 것이 기본이다
 	Destroy();
 }

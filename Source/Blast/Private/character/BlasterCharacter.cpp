@@ -12,6 +12,7 @@
 #include "character/BlasterAnimInstance.h"
 #include "BlasterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Blast/Blast.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -39,6 +40,7 @@ ABlasterCharacter::ABlasterCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 600.f);
 
@@ -69,7 +71,8 @@ void ABlasterCharacter::PostInitializeComponents()
 
 void ABlasterCharacter::PlayFireMontage(bool bAiming)
 {
-	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+	if (Combat == nullptr) return;
+	if (Combat->EquippedWeapon == nullptr) return;
 
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 	if (animInstance && FireWeaponMontage)
@@ -81,6 +84,22 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 		animInstance->Montage_JumpToSection(SectionName);
 	}
 }
+
+void ABlasterCharacter::PlayHitMontage()
+{
+	if (Combat == nullptr) return;
+	if (Combat->EquippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && HitReactMontage)
+	{
+		animInstance->Montage_Play(HitReactMontage);
+		FName SectionName = FName("FromRront");
+		animInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+
 
 void ABlasterCharacter::BeginPlay()
 {
@@ -296,6 +315,13 @@ void ABlasterCharacter::TurnInPlace(float DeltaTime)
 			StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		}
 	}
+}
+
+
+
+void ABlasterCharacter::MulticastHit_Implementation()
+{
+	PlayHitMontage();
 }
 
 void ABlasterCharacter::HideCameraIfCharacterIsClose()
