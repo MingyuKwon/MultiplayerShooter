@@ -33,6 +33,23 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	// Testures for the weapon crosshair
+
+	UPROPERTY(EditAnyWhere, Category = "CrossHairs")
+		class UTexture2D* CrosshairCenter;
+
+	UPROPERTY(EditAnyWhere, Category = "CrossHairs")
+		UTexture2D* CrosshairLeft;
+
+	UPROPERTY(EditAnyWhere, Category = "CrossHairs")
+		UTexture2D* CrosshairRight;
+
+	UPROPERTY(EditAnyWhere, Category = "CrossHairs")
+		UTexture2D* CrosshairTop;
+
+	UPROPERTY(EditAnyWhere, Category = "CrossHairs")
+		UTexture2D* CrosshairBottom;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -65,6 +82,9 @@ private:
 
 	UPROPERTY(EditAnyWhere, Category = "Weapon Properties")
 	TSubclassOf<class ACasing> CasingClass;
+
+
+
 
 public:
 	void SetWeaponState(EWeaponState weaponState);

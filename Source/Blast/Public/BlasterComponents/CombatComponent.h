@@ -52,9 +52,14 @@ protected:
 
 	void TraceUnderCrossHair(FHitResult& OutResult);
 
+
+	void SetHUDCrosshairs(float DeltaTime);
+
 private:
 
 	ABlasterCharacter* Character;
+	class ABlastPlayerController* playerController;
+	class ABlasterHUD* HUD;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
