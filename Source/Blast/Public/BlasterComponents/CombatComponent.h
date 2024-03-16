@@ -32,6 +32,9 @@ public:
 
 	void FireButtonPressed(bool bPressed);
 
+	FORCEINLINE FVector GetHitTarget() { return HitTarget; }
+
+
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
@@ -74,6 +77,9 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonpressed;
+
+	FVector HitTarget;
+
 
 	// HUD and Crosshair
 	float CrosshairVelocityVector;

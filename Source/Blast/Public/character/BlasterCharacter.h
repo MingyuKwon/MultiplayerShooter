@@ -75,8 +75,9 @@ private:
 	ETurningInPlace TurningInPlace;
 	void TurnInPlace(float DeltaTime);
 
+
 	UPROPERTY(EditAnyWhere, Category = "Combat")
-		class UAnimMontage* FireWeaponMontage;
+	class UAnimMontage* FireWeaponMontage;
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -86,5 +87,8 @@ public:
 	FORCEINLINE float GetAO_Pitch() { return AO_Pitch; }
 	AWeapon* GetEquippedWeapon();
 	FORCEINLINE ETurningInPlace GetTurningInPlace() { return TurningInPlace; }
+	FVector GetHitTarget();
+
+
 
 };
