@@ -78,11 +78,22 @@ private:
 
 	bool bFireButtonpressed;
 
-	FVector HitTarget;
-
-
 	// HUD and Crosshair
 	float CrosshairVelocityVector;
 	float CrosshairInAirFactor;
+	FVector HitTarget;
 
+	// Aiming and FOV
+	UPROPERTY(EditAnyWhere)
+	float DefaultFOV;
+
+	UPROPERTY(EditAnyWhere,  Category = "Combat")
+	float ZoomedFOV = 30.f;
+
+	float CurrentFOV;
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	float ZoomedInterpSpeed = 20.f;
+
+	void InterpFOV(float DeltaTime);
 };
