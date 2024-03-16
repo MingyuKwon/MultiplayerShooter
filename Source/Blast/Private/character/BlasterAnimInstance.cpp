@@ -36,7 +36,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsCrouched = BlasterCharacter->bIsCrouched;
 	bAiming = BlasterCharacter->IsAiming();
 	TurningInPlace = BlasterCharacter->GetTurningInPlace();
-
+	bRotateRootBone = BlasterCharacter->ShouldRotateRootBone();
 	// offset yaw for strafing
 
 	// 이게 컨트롤러 가 보고있는, 즉 카메라가 보고 있는 정면의 rotation
