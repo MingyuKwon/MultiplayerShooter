@@ -81,6 +81,10 @@ private:
 	// HUD and Crosshair
 	float CrosshairVelocityVector;
 	float CrosshairInAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootFactor;
+
+
 	FVector HitTarget;
 
 	// Aiming and FOV
