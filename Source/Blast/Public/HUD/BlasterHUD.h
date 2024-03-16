@@ -42,6 +42,7 @@ public:
 private:
 	FHUDPackage HUDPackage;
 
+	void DrawCrosshiar(UTexture2D* Texture, FVector2D ViewportCententer);
 public:
 	FORCEINLINE void SetHUDPackage(const FHUDPackage& package) {HUDPackage = package;}
 };
