@@ -209,6 +209,13 @@ void UCombatComponent::TraceUnderCrossHair(FHitResult& OutResult)
 	if (bScreentoWorld)
 	{
 		FVector Start = CrossHairLocation;
+
+		if (Character)
+		{
+			float DistancetoCharacter = (Character->GetActorLocation() - Start).Size();
+			Start += CrossHairDirection * (DistancetoCharacter + 100.f);
+		}
+
 		FVector End = Start + CrossHairDirection * TRACE_LENGTH;
 
 		GetWorld()->LineTraceSingleByChannel(
