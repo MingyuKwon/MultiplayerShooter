@@ -33,6 +33,8 @@ public:
 
 	void FireButtonPressed(bool bPressed);
 
+	void Fire();
+
 	FORCEINLINE FVector GetHitTarget() { return HitTarget; }
 
 
@@ -102,6 +104,14 @@ private:
 
 	void InterpFOV(float DeltaTime);
 
+
+	//Automatic fire
+	FTimerHandle FireTimer;
+
+	bool bCanFire = true;
+
+	void StartFireTimer();
+	void FireTimerFinished();
 
 	FHUDPackage HUDPackage;
 

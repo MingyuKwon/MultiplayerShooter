@@ -12,6 +12,7 @@
 #include "character/BlasterAnimInstance.h"
 #include "BlasterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Blast/Blast.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -39,6 +40,7 @@ ABlasterCharacter::ABlasterCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 600.f);
 
@@ -69,17 +71,39 @@ void ABlasterCharacter::PostInitializeComponents()
 
 void ABlasterCharacter::PlayFireMontage(bool bAiming)
 {
-	if (Combat == nullptr || Combat->EquippedWeapon == nullptr) return;
+	if (Combat == nullptr) return;
+	if (Combat->EquippedWeapon == nullptr) return;
 
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 	if (animInstance && FireWeaponMontage)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString("PlayFireMontage"));
-
 		animInstance->Montage_Play(FireWeaponMontage);
 		FName SectionName = bAiming ? FName("RifleHip") : FName("RifleAim");
 		animInstance->Montage_JumpToSection(SectionName);
 	}
+}
+
+void ABlasterCharacter::PlayHitMontage()
+{
+	if (Combat == nullptr) return;
+	if (Combat->EquippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && HitReactMontage)
+	{
+		animInstance->Montage_Play(HitReactMontage);
+		FName SectionName = FName("FromRront");
+		animInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+
+
+void ABlasterCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+	SimProxiesTurn();
+	TimeSinceLastMovementReplication = 0.f;
 }
 
 void ABlasterCharacter::BeginPlay()
@@ -90,9 +114,24 @@ void ABlasterCharacter::BeginPlay()
 void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AimOffset(DeltaTime);
+
+	// 여기서 자기가 authority, autonomous 라면 에임 오프셋을 쫓고, 그에 맞춰 회전을 시키고, 돌지만
+	if (GetLocalRole() > ENetRole::ROLE_SimulatedProxy && IsLocallyControlled())
+	{
+		AimOffset(DeltaTime);
+	}
+	else
+	{
+		TimeSinceLastMovementReplication += DeltaTime;
+		if (TimeSinceLastMovementReplication > 0.25f)
+		{
+			OnRep_ReplicatedMovement();
+		}
+		CalcAO_Pitch();
+	}
 
 	HideCameraIfCharacterIsClose();
+
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -217,13 +256,19 @@ void ABlasterCharacter::FireButtonReleased()
 	}
 }
 
+float ABlasterCharacter::CalcualteSpeed()
+{
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.f;
+	return Velocity.Size();
+
+}
+
 void ABlasterCharacter::AimOffset(float DeltaTime)
 {
 	if (Combat && Combat->EquippedWeapon == nullptr) return;
 
-	FVector Velocity = GetVelocity();
-	Velocity.Z = 0.f;
-	float speed = Velocity.Size();
+	float speed = CalcualteSpeed();
 	bool bIsInAir = GetCharacterMovement()->IsFalling();
 
 	// 에임 오프셋은, 우리가 움직일 떄는 적용하지 않고 가만히 서있으면서 다른 방향을 조준 할 때 사용한다.
@@ -231,6 +276,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 
 	if (speed == 0.f && !bIsInAir) // Standing still, not jumping
 	{
+		bRotateRootBone = true;
 		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
 		AO_Yaw = DeltaAimRotation.Yaw;
@@ -243,6 +289,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	}
 	else // running or jumping
 	{
+		bRotateRootBone = false;
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		AO_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
@@ -252,6 +299,13 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	// Pith는 이동과 별 상관이 없으므로 그냥 해도 됨
 	// 이 값이 서버로 갈 때 서버는 회전 각도를 0~360으로 처리하는 문제가 있다
 	// 우리는 ao-pitch의 값이 -90~90이라고 생각하고 애니메이션을 짰는데 서버로 전송되어서 압축 해제 된 값은 0~360이었던 것
+	CalcAO_Pitch();
+
+	//AO_Yaw 는 애초에 원래 있던 위치와 비교해서 각도를 정하니까 이런 문제가 없는데 pitch는 그냥 회전 값을 생으로 가져와서 사용해서 이런 문제가 생긴다
+}
+
+void ABlasterCharacter::CalcAO_Pitch()
+{
 	AO_Pitch = GetBaseAimRotation().Pitch;
 	if (AO_Pitch > 90.f && !IsLocallyControlled())
 	{
@@ -261,8 +315,47 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		// 그래서 서버 측이면 0~360 범위라면 그 값을 다시 정정 시켜줘야 한다
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
+}
 
-	//AO_Yaw 는 애초에 원래 있던 위치와 비교해서 각도를 정하니까 이런 문제가 없는데 pitch는 그냥 회전 값을 생으로 가져와서 사용해서 이런 문제가 생긴다
+void ABlasterCharacter::SimProxiesTurn()
+{
+	if (Combat == nullptr) return;
+	if (Combat->EquippedWeapon == nullptr) return;
+	bRotateRootBone = false;
+
+	float speed = CalcualteSpeed();
+	if (speed > 0.f)
+	{
+		TurningInPlace = ETurningInPlace::ERIP_NotTurning;
+		return;
+	}
+
+	ProxyRotatinLastFrame = ProxyRotatin;
+	ProxyRotatin = GetActorRotation();
+	ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotatin , ProxyRotatinLastFrame).Yaw;
+
+	if (FMath::Abs(ProxyYaw) > TurnThreshold)
+	{
+		if (ProxyYaw > TurnThreshold)
+		{
+			TurningInPlace = ETurningInPlace::ERIP_Right;
+		}
+		else if (ProxyYaw < -TurnThreshold)
+		{
+			TurningInPlace = ETurningInPlace::ERIP_Left;
+		}
+		else
+		{
+			TurningInPlace = ETurningInPlace::ERIP_NotTurning;
+
+		}
+
+		return;
+	}
+
+	TurningInPlace = ETurningInPlace::ERIP_NotTurning;
+
+
 }
 
 
@@ -298,6 +391,13 @@ void ABlasterCharacter::TurnInPlace(float DeltaTime)
 	}
 }
 
+
+
+void ABlasterCharacter::MulticastHit_Implementation()
+{
+	PlayHitMontage();
+}
+
 void ABlasterCharacter::HideCameraIfCharacterIsClose()
 {
 	if (!IsLocallyControlled()) return;
@@ -305,7 +405,7 @@ void ABlasterCharacter::HideCameraIfCharacterIsClose()
 	if ((FollowCamera->GetComponentLocation() - GetActorLocation()).Size() < CameraThreshold)
 	{
 		GetMesh()->SetVisibility(false);
-		if (Combat && Combat->EquippedWeapon->GetWeaponMesh())
+		if (Combat && Combat->EquippedWeapon)
 		{
 			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = true;
 		}

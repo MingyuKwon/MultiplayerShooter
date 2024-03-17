@@ -20,7 +20,12 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
+	void PlayHitMontage();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHit();
+
+	virtual void OnRep_ReplicatedMovement() override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,6 +47,8 @@ protected:
 	void FireButtonReleased();
 
 	void AimOffset(float DeltaTime);
+	void CalcAO_Pitch();
+	void SimProxiesTurn();
 
 private:
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
@@ -67,6 +74,8 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 
+
+
 	float AO_Yaw;
 	// 임계점에 도달해서 돌아야 할 떄는 -90까지 갔던 것이 0으로 (정면으로) 돌아가야 한다. 그떄 보간에 사용하기 위한 변수. 
 	float Interp_AO_Yaw;
@@ -82,9 +91,25 @@ private:
 	class UAnimMontage* FireWeaponMontage;
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
+	class UAnimMontage* HitReactMontage;
+
+
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
 	float CameraThreshold = 200.f;
 
+	float TurnThreshold = 0.5f;
+	FRotator ProxyRotatinLastFrame;
+	FRotator ProxyRotatin;
+	float ProxyYaw;
+
+	float TimeSinceLastMovementReplication;
+
+	bool bRotateRootBone;
+
 	void HideCameraIfCharacterIsClose();
+
+	float CalcualteSpeed();
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -96,5 +121,6 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() { return TurningInPlace; }
 	FVector GetHitTarget();
 	FORCEINLINE UCameraComponent* GetFollowCamera() { return FollowCamera; }
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 
 };

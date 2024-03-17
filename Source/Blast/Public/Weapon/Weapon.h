@@ -51,6 +51,13 @@ public:
 		UTexture2D* CrosshairBottom;
 
 
+	// Automatic FIre
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	float FireDelay = 0.15f;
+
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	bool bAutomatic;
+
 	//Zoom FOW while aming
 
 	UPROPERTY(EditAnyWhere)
