@@ -12,6 +12,7 @@ void UBlasterAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	BlasterCharacter = Cast<ABlasterCharacter>(TryGetPawnOwner());
+
 }
 
 void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
@@ -37,6 +38,8 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bAiming = BlasterCharacter->IsAiming();
 	TurningInPlace = BlasterCharacter->GetTurningInPlace();
 	bRotateRootBone = BlasterCharacter->ShouldRotateRootBone();
+	bLocallyControlled = BlasterCharacter->IsLocallyControlled();
+
 	// offset yaw for strafing
 
 	// 이게 컨트롤러 가 보고있는, 즉 카메라가 보고 있는 정면의 rotation
@@ -63,19 +66,11 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	if (bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && BlasterCharacter->GetMesh())
 	{
-		LeftHandTransfom = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), ERelativeTransformSpace::RTS_World);
-		FVector OutPosition;
-		FRotator OutRotation;
-		BlasterCharacter->GetMesh()->TransformFromBoneSpace(FName("hand_r"), LeftHandTransfom.GetLocation(), FRotator::ZeroRotator, OutPosition, OutRotation);
-		LeftHandTransfom.SetLocation(OutPosition);
-		LeftHandTransfom.SetRotation(FQuat(OutRotation));
-
 		if (BlasterCharacter->IsLocallyControlled())
 		{
 			FTransform	RightHandTransfom = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("hand_r"), ERelativeTransformSpace::RTS_World);
 			FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(RightHandTransfom.GetLocation(), RightHandTransfom.GetLocation() + (RightHandTransfom.GetLocation() - BlasterCharacter->GetHitTarget()));
 			RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 30.f);
-
 		}
 
 	}

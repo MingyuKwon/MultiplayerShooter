@@ -80,10 +80,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimi
 	if (BlasterCharacter)
 	{
 		BlasterCharacter->MulticastHit();
-<<<<<<< HEAD
-		UE_LOG(LogTemp, Warning , TEXT("Sex"));
-=======
->>>>>>> 367daa4df879ba69e5056c1130ac8f4bd71e6239
 	}
 
 	// 내가 딱히 replicate 된 속성을 만들지 않더라도, replicate 선언된 액터가 죽으면 그게 모든 클라이언트 , 서버에 알려지게 되는 것이 기본이다
