@@ -111,6 +111,16 @@ private:
 
 	float CalcualteSpeed();
 
+
+	UPROPERTY(EditAnyWhere, Category = "Player Stats")
+	float MaxHealth = 100.f;
+
+	UPROPERTY(EditAnyWhere, ReplicatedUsing = OnRep_Health,Category = "Player Stats")
+	float Health = 100.f;
+
+	UFUNCTION()
+	void OnRep_Health();
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool isWeaponEquipped();
