@@ -113,12 +113,40 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BlastPlayerController = Cast<ABlastPlayerController>(Controller);
+	UpdateHUDHealth();
+
+	if (HasAuthority())
+	{
+		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
+	}
+}
+
+void ABlasterCharacter::UpdateHUDHealth()
+{
+	BlastPlayerController = BlastPlayerController == nullptr ? Cast<ABlastPlayerController>(Controller) : BlastPlayerController;
+
 	if (BlastPlayerController)
 	{
 		BlastPlayerController->SetHealthHUD(Health, MaxHealth);
 	}
 }
+
+void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	Health = FMath::Clamp(Health - Damage, 0, MaxHealth);
+
+	// 어짜피 모든 데미지 연산은 서버에서 일어나기에 이 Reveive damage는 서버에서만 일어난다
+	UpdateHUDHealth();
+	PlayHitMontage();
+}
+
+void ABlasterCharacter::OnRep_Health()
+{
+	// 이건 replicate 된 health에 반응해서 일어나느 ㄴ것이므로 클라이언트 에서만 실행 된다
+	UpdateHUDHealth();
+	PlayHitMontage();
+}
+
 
 void ABlasterCharacter::Tick(float DeltaTime)
 {
@@ -401,12 +429,6 @@ void ABlasterCharacter::TurnInPlace(float DeltaTime)
 }
 
 
-
-void ABlasterCharacter::MulticastHit_Implementation()
-{
-	PlayHitMontage();
-}
-
 void ABlasterCharacter::HideCameraIfCharacterIsClose()
 {
 	if (!IsLocallyControlled()) return;
@@ -429,10 +451,6 @@ void ABlasterCharacter::HideCameraIfCharacterIsClose()
 	}
 }
 
-void ABlasterCharacter::OnRep_Health()
-{
-
-}
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 {

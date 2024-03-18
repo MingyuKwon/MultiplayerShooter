@@ -76,12 +76,6 @@ void AProjectile::Destroyed()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit)
 {
-	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(otherActor);
-	if (BlasterCharacter)
-	{
-		BlasterCharacter->MulticastHit();
-	}
-
 	// 내가 딱히 replicate 된 속성을 만들지 않더라도, replicate 선언된 액터가 죽으면 그게 모든 클라이언트 , 서버에 알려지게 되는 것이 기본이다
 	Destroy();
 }
