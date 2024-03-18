@@ -24,7 +24,9 @@ public:
 	void PlayElimMontage();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Eliminated();
+	void MulticastElim();
+
+	void Elim();
 
 
 	virtual void OnRep_ReplicatedMovement() override;
@@ -128,6 +130,13 @@ private:
 	float Health = 100.f;
 
 	bool bElimed = false;
+
+	FTimerHandle ElimTimer;
+
+	UPROPERTY(EditAnyWhere)
+	float ElimDelay = 3.f;
+
+	void ElimTimerFinished();
 
 	UFUNCTION()
 	void OnRep_Health();

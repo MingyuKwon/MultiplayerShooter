@@ -15,6 +15,7 @@
 #include "Blast/Blast.h"
 #include "Controller/BlastPlayerController.h"
 #include "GameMode/BlasterGameMode.h"
+#include "TimerManager.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -113,7 +114,6 @@ void ABlasterCharacter::PlayHitMontage()
 }
 
 
-
 void ABlasterCharacter::OnRep_ReplicatedMovement()
 {
 	Super::OnRep_ReplicatedMovement();
@@ -164,6 +164,7 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	}
 	
 }
+
 
 void ABlasterCharacter::OnRep_Health()
 {
@@ -420,10 +421,32 @@ void ABlasterCharacter::SimProxiesTurn()
 
 }
 
-void ABlasterCharacter::Eliminated_Implementation()
+void ABlasterCharacter::Elim()
+{
+	MulticastElim();
+	GetWorldTimerManager().SetTimer(
+		ElimTimer,
+		this,
+		&ABlasterCharacter::ElimTimerFinished,
+		ElimDelay
+	);
+}
+
+
+void ABlasterCharacter::MulticastElim_Implementation()
 {
 	bElimed = true;
 	PlayElimMontage();
+}
+
+void ABlasterCharacter::ElimTimerFinished()
+{
+	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	if (BlasterGameMode)
+	{
+		BlasterGameMode->RequestRespawn(this, Controller);
+	}
+
 }
 
 
