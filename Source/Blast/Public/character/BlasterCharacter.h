@@ -121,6 +121,9 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+
+	class ABlastPlayerController* BlastPlayerController;
+
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool isWeaponEquipped();

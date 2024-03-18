@@ -14,7 +14,7 @@ class BLAST_API UCharacterOverlayWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-private:
+public:
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthBar;
 

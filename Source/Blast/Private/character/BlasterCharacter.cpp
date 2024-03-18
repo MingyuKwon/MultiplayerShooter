@@ -13,6 +13,7 @@
 #include "BlasterComponents/CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Blast/Blast.h"
+#include "Controller/BlastPlayerController.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -111,6 +112,12 @@ void ABlasterCharacter::OnRep_ReplicatedMovement()
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	BlastPlayerController = Cast<ABlastPlayerController>(Controller);
+	if (BlastPlayerController)
+	{
+		BlastPlayerController->SetHealthHUD(Health, MaxHealth);
+	}
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
