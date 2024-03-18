@@ -21,6 +21,11 @@ public:
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
 	void PlayHitMontage();
+	void PlayElimMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Eliminated();
+
 
 	virtual void OnRep_ReplicatedMovement() override;
 protected:
@@ -49,7 +54,6 @@ protected:
 	void CalcAO_Pitch();
 	void SimProxiesTurn();
 
-	void Eliminated();
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -97,7 +101,8 @@ private:
 	UPROPERTY(EditAnyWhere, Category = "Combat")
 	class UAnimMontage* HitReactMontage;
 
-
+	UPROPERTY(EditAnyWhere, Category = "Combat")
+	class UAnimMontage* ElimMontage;
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
 	float CameraThreshold = 200.f;
@@ -122,6 +127,8 @@ private:
 	UPROPERTY(EditAnyWhere, ReplicatedUsing = OnRep_Health,Category = "Player Stats")
 	float Health = 100.f;
 
+	bool bElimed = false;
+
 	UFUNCTION()
 	void OnRep_Health();
 
@@ -139,5 +146,6 @@ public:
 	FVector GetHitTarget();
 	FORCEINLINE UCameraComponent* GetFollowCamera() { return FollowCamera; }
 	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
+	FORCEINLINE bool IsElimed() const { return bElimed; }
 
 };

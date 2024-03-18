@@ -87,6 +87,17 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+void ABlasterCharacter::PlayElimMontage()
+{
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && ElimMontage)
+	{
+		animInstance->Montage_Play(ElimMontage);
+	}
+}
+
+
+
 void ABlasterCharacter::PlayHitMontage()
 {
 	if (Combat == nullptr) return;
@@ -409,9 +420,10 @@ void ABlasterCharacter::SimProxiesTurn()
 
 }
 
-void ABlasterCharacter::Eliminated()
+void ABlasterCharacter::Eliminated_Implementation()
 {
-
+	bElimed = true;
+	PlayElimMontage();
 }
 
 
