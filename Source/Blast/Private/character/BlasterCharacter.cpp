@@ -14,6 +14,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Blast/Blast.h"
 #include "Controller/BlastPlayerController.h"
+#include "GameMode/BlasterGameMode.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -138,6 +139,19 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	// 어짜피 모든 데미지 연산은 서버에서 일어나기에 이 Reveive damage는 서버에서만 일어난다
 	UpdateHUDHealth();
 	PlayHitMontage();
+
+	if (Health <= 0.f)
+	{
+		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+		if (BlasterGameMode)
+		{
+			BlastPlayerController = BlastPlayerController == nullptr ? Cast<ABlastPlayerController>(Controller) : BlastPlayerController;
+			ABlastPlayerController* KillingPlayerController = Cast<ABlastPlayerController>(InstigatedBy);
+
+			BlasterGameMode->PlayerEliminated(this, KillingPlayerController, BlastPlayerController);
+		}
+	}
+	
 }
 
 void ABlasterCharacter::OnRep_Health()
@@ -392,6 +406,11 @@ void ABlasterCharacter::SimProxiesTurn()
 
 	TurningInPlace = ETurningInPlace::ERIP_NotTurning;
 
+
+}
+
+void ABlasterCharacter::Eliminated()
+{
 
 }
 

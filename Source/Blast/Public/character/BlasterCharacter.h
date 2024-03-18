@@ -49,6 +49,8 @@ protected:
 	void CalcAO_Pitch();
 	void SimProxiesTurn();
 
+	void Eliminated();
+
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
