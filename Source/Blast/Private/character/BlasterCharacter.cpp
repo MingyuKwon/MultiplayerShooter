@@ -16,6 +16,7 @@
 #include "Controller/BlastPlayerController.h"
 #include "GameMode/BlasterGameMode.h"
 #include "TimerManager.h"
+#include "PlayerState/BlasterPlayerState.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -170,6 +171,18 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 
 }
 
+void ABlasterCharacter::PollInit()
+{
+	if (BlasterplayerState == nullptr)
+	{
+		BlasterplayerState = GetPlayerState<ABlasterPlayerState>();
+		if (BlasterplayerState)
+		{
+			BlasterplayerState->AddtoScore(0.f);
+		}
+	}
+}
+
 
 void ABlasterCharacter::UpdateDissolveTrack(float DissolveValue)
 {
@@ -218,7 +231,7 @@ void ABlasterCharacter::Tick(float DeltaTime)
 	}
 
 	HideCameraIfCharacterIsClose();
-
+	PollInit();
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

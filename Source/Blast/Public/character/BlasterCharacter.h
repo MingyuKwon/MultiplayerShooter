@@ -61,6 +61,8 @@ protected:
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 
+	void PollInit();
+
 	// Dissolve start
 
 	UPROPERTY(VisibleAnywhere)
@@ -171,6 +173,8 @@ private:
 		void OnRep_Health();
 
 	class ABlastPlayerController* BlastPlayerController;
+
+	class ABlasterPlayerState* BlasterplayerState;
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
