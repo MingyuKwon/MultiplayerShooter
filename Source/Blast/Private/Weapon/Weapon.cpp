@@ -32,8 +32,13 @@ AWeapon::AWeapon()
 
 	PickUpWidget = CreateDefaultSubobject<UWidgetComponent>(FName("PickupWidget"));
 	PickUpWidget->SetupAttachment(RootComponent);
+}
 
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AWeapon, WeaponState)
 }
 
 void AWeapon::BeginPlay()
@@ -84,8 +89,17 @@ void AWeapon::OnRep_WeaponState()
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
 
+	case EWeaponState::EWS_Dropped:
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString("EWS_Dropped"));
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		break;
 	}
 }
 
@@ -99,6 +113,21 @@ void AWeapon::SetWeaponState(EWeaponState weaponState)
 	case EWeaponState::EWS_Equipped:
 		ShowPickupWidget(false);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		break;
+
+	case EWeaponState::EWS_Dropped:
+		if (HasAuthority())
+		{
+			AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		}
+
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 
 	}
@@ -147,10 +176,14 @@ void AWeapon::Fire(const FVector& hitTarget)
 	}
 }
 
-void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AWeapon::Dropped()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	SetWeaponState(EWeaponState::EWS_Dropped);
+	SetOwner(nullptr);
 
-	DOREPLIFETIME_CONDITION(AWeapon, WeaponState, COND_OwnerOnly)
+	FDetachmentTransformRules detachRule(EDetachmentRule::KeepWorld, true);
+	WeaponMesh->DetachFromComponent(detachRule);
 }
+
+
 

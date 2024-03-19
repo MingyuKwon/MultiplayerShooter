@@ -118,6 +118,13 @@ void UCombatComponent::OnRep_EquippedWeapon()
 	// 따라서 서버에서 실행 되도록 코드를 짰는데, 그 영향을 받고 싶으면 reply에 넣어야 한다
 	if (EquippedWeapon && Character)
 	{
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		const USkeletalMeshSocket* handWeaponSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		if (handWeaponSocket)
+		{
+			handWeaponSocket->AttachActor(EquippedWeapon, Character->GetMesh());
+		}
+
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 	}
@@ -222,8 +229,6 @@ void UCombatComponent::Fire()
 {
 	if (bCanFire)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString("bCanFire true"));
-
 		bCanFire = false;
 		ServerFire(HitTarget);
 
@@ -259,10 +264,7 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-
 	const USkeletalMeshSocket* handWeaponSocket =  Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-
-
 	if (handWeaponSocket)
 	{
 		handWeaponSocket->AttachActor(EquippedWeapon, Character->GetMesh());

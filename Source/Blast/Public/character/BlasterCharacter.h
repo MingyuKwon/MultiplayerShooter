@@ -58,7 +58,7 @@ protected:
 
 
 	UFUNCTION()
-		void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 
 	// Dissolve start
@@ -68,13 +68,15 @@ protected:
 
 	FOnTimelineFloat DissolveTrack;
 
-	UPROPERTY(EditAnyWhere)
-		UCurveFloat* DissolveCurve;
 
 	UFUNCTION()
-		void UpdateDissolveTrack(float DissolveValue);
+	void UpdateDissolveTrack(float DissolveValue);
 
 	void StartDissolve();
+
+
+	UPROPERTY(EditAnyWhere, Category = "Elim")
+	UCurveFloat* DissolveCurve;
 
 	// Dynamic Material instance that we can change dusring runtime
 	UPROPERTY(VisibleAnywhere, Category = "Elim")

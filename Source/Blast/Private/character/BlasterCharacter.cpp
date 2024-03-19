@@ -445,6 +445,11 @@ void ABlasterCharacter::SimProxiesTurn()
 
 void ABlasterCharacter::Elim()
 {
+	if (Combat && Combat->EquippedWeapon)
+	{
+		Combat->EquippedWeapon->Dropped();
+	}
+
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(
 		ElimTimer,
@@ -460,6 +465,7 @@ void ABlasterCharacter::MulticastElim_Implementation()
 	bElimed = true;
 	PlayElimMontage();
 
+	//Start Dissolve Effect
 	if (DissolveMaterial)
 	{
 		DynamicDissolveMaterial = UMaterialInstanceDynamic::Create(DissolveMaterial, this);
@@ -467,10 +473,21 @@ void ABlasterCharacter::MulticastElim_Implementation()
 
 		DynamicDissolveMaterial->SetScalarParameterValue(TEXT("DissolveRate"), -0.55f);
 		DynamicDissolveMaterial->SetScalarParameterValue(TEXT("Glow"), 100.f);
+	}
+	StartDissolve();
 
+	//Disable Movement
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+	if (BlastPlayerController)
+	{
+		DisableInput(BlastPlayerController);
 	}
 
-	StartDissolve();
+	//Disable Collision
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 }
 
 void ABlasterCharacter::ElimTimerFinished()

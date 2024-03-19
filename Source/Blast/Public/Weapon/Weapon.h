@@ -31,6 +31,8 @@ public:
 
 	virtual void Fire(const FVector& hitTarget);
 
+	virtual void Dropped();
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// Testures for the weapon crosshair
