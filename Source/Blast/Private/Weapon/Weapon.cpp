@@ -95,7 +95,6 @@ void AWeapon::OnRep_WeaponState()
 		break;
 
 	case EWeaponState::EWS_Dropped:
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString("EWS_Dropped"));
 		WeaponMesh->SetSimulatePhysics(true);
 		WeaponMesh->SetEnableGravity(true);
 		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

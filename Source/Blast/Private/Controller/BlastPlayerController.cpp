@@ -6,11 +6,24 @@
 #include "HUD/CharacterOverlayWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "character/BlasterCharacter.h"
 
 void ABlastPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+}
+
+void ABlastPlayerController::OnPossess(APawn* pawn)
+{
+	Super::OnPossess(pawn);
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(pawn);
+	if (BlasterCharacter)
+	{
+		SetHealthHUD(BlasterCharacter->GetHealth(), BlasterCharacter->GetMaxHealth());
+	}
+	
 }
 
 void ABlastPlayerController::SetHealthHUD(float Health, float MaxHealth)

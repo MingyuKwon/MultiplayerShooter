@@ -128,6 +128,8 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FString str = FString::Printf(TEXT("Health : %f , MaxHealth : %f"), GetHealth(), GetMaxHealth());
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, *str);
 	UpdateHUDHealth();
 
 	if (HasAuthority())
