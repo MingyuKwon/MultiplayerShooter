@@ -51,6 +51,9 @@ ABlasterCharacter::ABlasterCharacter()
 
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
+
+
+	DissolveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Dissolve TImeline"));
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,7 +61,7 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	//DOREPLIFETIME 만 하면, 서버에서 그 누구가 weapon을 바꾸기만 하면 모든 blastChaacter들이 영향을 받는다. 영향을 받는 범위를 제한하고 싶다면 CONDITION이 추가된 매크로를 사용한다
-	DOREPLIFETIME_CONDITION(ABlasterCharacter , OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ABlasterCharacter, Health);
 
 }
@@ -162,9 +165,28 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 			BlasterGameMode->PlayerEliminated(this, KillingPlayerController, BlastPlayerController);
 		}
 	}
-	
+
 }
 
+
+void ABlasterCharacter::UpdateDissolveTrack(float DissolveValue)
+{
+	if (DynamicDissolveMaterial)
+	{
+		DynamicDissolveMaterial->SetScalarParameterValue(TEXT("DissolveRate"), DissolveValue);
+
+	}
+}
+
+void ABlasterCharacter::StartDissolve()
+{
+	DissolveTrack.BindDynamic(this, &ABlasterCharacter::UpdateDissolveTrack);
+	if (DissolveCurve)
+	{
+		DissolveTimeline->AddInterpFloat(DissolveCurve, DissolveTrack);
+		DissolveTimeline->Play();
+	}
+}
 
 void ABlasterCharacter::OnRep_Health()
 {
@@ -201,7 +223,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(FName("Jump"),EInputEvent::IE_Pressed ,this, &ABlasterCharacter::Jump);
+	PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::Jump);
 	PlayerInputComponent->BindAction(FName("Equip"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::EquipButtonPressed);
 	PlayerInputComponent->BindAction(FName("Crouch"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::CrouchButtonPressed);
 	PlayerInputComponent->BindAction(FName("Aim"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::AimButtonPressed);
@@ -222,7 +244,7 @@ void ABlasterCharacter::MoveForward(float Value)
 	if (Controller != nullptr && Value != 0.f)
 	{
 		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-		const FVector Direction( FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
+		const FVector Direction(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X));
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -284,7 +306,7 @@ void ABlasterCharacter::CrouchButtonPressed()
 	{
 		Crouch();
 	}
-	
+
 }
 
 void ABlasterCharacter::AimButtonPressed()
@@ -395,7 +417,7 @@ void ABlasterCharacter::SimProxiesTurn()
 
 	ProxyRotatinLastFrame = ProxyRotatin;
 	ProxyRotatin = GetActorRotation();
-	ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotatin , ProxyRotatinLastFrame).Yaw;
+	ProxyYaw = UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotatin, ProxyRotatinLastFrame).Yaw;
 
 	if (FMath::Abs(ProxyYaw) > TurnThreshold)
 	{
@@ -437,6 +459,18 @@ void ABlasterCharacter::MulticastElim_Implementation()
 {
 	bElimed = true;
 	PlayElimMontage();
+
+	if (DissolveMaterial)
+	{
+		DynamicDissolveMaterial = UMaterialInstanceDynamic::Create(DissolveMaterial, this);
+		GetMesh()->SetMaterial(0, DynamicDissolveMaterial);
+
+		DynamicDissolveMaterial->SetScalarParameterValue(TEXT("DissolveRate"), -0.55f);
+		DynamicDissolveMaterial->SetScalarParameterValue(TEXT("Glow"), 100.f);
+
+	}
+
+	StartDissolve();
 }
 
 void ABlasterCharacter::ElimTimerFinished()
@@ -537,7 +571,7 @@ bool ABlasterCharacter::IsAiming()
 
 AWeapon* ABlasterCharacter::GetEquippedWeapon()
 {
-	if(Combat == nullptr) return nullptr;
+	if (Combat == nullptr) return nullptr;
 	return Combat->EquippedWeapon;
 }
 

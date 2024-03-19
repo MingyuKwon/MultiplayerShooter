@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blast/BlasterTypes/TurningInPlace.h"
 #include "Interaction/InteractWithCrosshairsInterface.h"
-
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "BlasterCharacter.generated.h"
 
@@ -24,7 +24,7 @@ public:
 	void PlayElimMontage();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastElim();
+		void MulticastElim();
 
 	void Elim();
 
@@ -58,31 +58,57 @@ protected:
 
 
 	UFUNCTION()
-	void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+		void ReceiveDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+
+	// Dissolve start
+
+	UPROPERTY(VisibleAnywhere)
+		UTimelineComponent* DissolveTimeline;
+
+	FOnTimelineFloat DissolveTrack;
+
+	UPROPERTY(EditAnyWhere)
+		UCurveFloat* DissolveCurve;
+
+	UFUNCTION()
+		void UpdateDissolveTrack(float DissolveValue);
+
+	void StartDissolve();
+
+	// Dynamic Material instance that we can change dusring runtime
+	UPROPERTY(VisibleAnywhere, Category = "Elim")
+		UMaterialInstanceDynamic* DynamicDissolveMaterial;
+
+	//  Material instance that set in blueprint, used in dynamic instance
+	UPROPERTY(EditAnyWhere, Category = "Elim")
+		UMaterialInstance* DissolveMaterial;
+
+	// Dissolve end
 
 private:
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
-	class USpringArmComponent* CameraBoom;
+		class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
-	class UCameraComponent* FollowCamera;
+		class UCameraComponent* FollowCamera;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UWidgetComponent* OverheadWidget;
+		class UWidgetComponent* OverheadWidget;
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
-	class AWeapon* OverlappingWeapon;
-	
+		class AWeapon* OverlappingWeapon;
+
 
 	// 이 함수는 replicate 된 경우, 자동 호출 되는 함수이기에, 어떻게 보면 서버 자체는 실행하지 못하는 함수이다
 	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+		void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
 	UPROPERTY(VisibleAnyWhere)
-	class UCombatComponent* Combat;
+		class UCombatComponent* Combat;
 
 	UFUNCTION(Server, Reliable)
-	void ServerEquipButtonPressed();
+		void ServerEquipButtonPressed();
 
 
 
@@ -98,16 +124,16 @@ private:
 
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
-	class UAnimMontage* FireWeaponMontage;
+		class UAnimMontage* FireWeaponMontage;
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
-	class UAnimMontage* HitReactMontage;
+		class UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
-	class UAnimMontage* ElimMontage;
+		class UAnimMontage* ElimMontage;
 
 	UPROPERTY(EditAnyWhere, Category = "Combat")
-	float CameraThreshold = 200.f;
+		float CameraThreshold = 200.f;
 
 	float TurnThreshold = 0.5f;
 	FRotator ProxyRotatinLastFrame;
@@ -124,23 +150,23 @@ private:
 
 
 	UPROPERTY(EditAnyWhere, Category = "Player Stats")
-	float MaxHealth = 100.f;
+		float MaxHealth = 100.f;
 
-	UPROPERTY(EditAnyWhere, ReplicatedUsing = OnRep_Health,Category = "Player Stats")
-	float Health = 100.f;
+	UPROPERTY(EditAnyWhere, ReplicatedUsing = OnRep_Health, Category = "Player Stats")
+		float Health = 100.f;
 
 	bool bElimed = false;
 
 	FTimerHandle ElimTimer;
 
 	UPROPERTY(EditAnyWhere)
-	float ElimDelay = 3.f;
+		float ElimDelay = 3.f;
 
 	void ElimTimerFinished();
 
-	UFUNCTION()
-	void OnRep_Health();
 
+	UFUNCTION()
+		void OnRep_Health();
 
 	class ABlastPlayerController* BlastPlayerController;
 
@@ -148,7 +174,7 @@ public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool isWeaponEquipped();
 	bool IsAiming();
-	FORCEINLINE float GetAO_Yaw() {return AO_Yaw;}
+	FORCEINLINE float GetAO_Yaw() { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() { return AO_Pitch; }
 	AWeapon* GetEquippedWeapon();
 	FORCEINLINE ETurningInPlace GetTurningInPlace() { return TurningInPlace; }
