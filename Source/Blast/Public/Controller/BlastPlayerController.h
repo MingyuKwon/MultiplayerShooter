@@ -17,6 +17,8 @@ class BLAST_API ABlastPlayerController : public APlayerController
 public:
 	void SetHealthHUD(float Health, float MaxHealth);
 	void SetScoreHUD(float Score);
+	void SetDefeatHUD(int32 Defeats);
+
 
 protected:
 	virtual void BeginPlay() override;

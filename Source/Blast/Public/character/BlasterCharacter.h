@@ -66,7 +66,7 @@ protected:
 	// Dissolve start
 
 	UPROPERTY(VisibleAnywhere)
-		UTimelineComponent* DissolveTimeline;
+	UTimelineComponent* DissolveTimeline;
 
 	FOnTimelineFloat DissolveTrack;
 
@@ -86,7 +86,7 @@ protected:
 
 	//  Material instance that set in blueprint, used in dynamic instance
 	UPROPERTY(EditAnyWhere, Category = "Elim")
-		UMaterialInstance* DissolveMaterial;
+	UMaterialInstance* DissolveMaterial;
 
 	// Dissolve end
 
@@ -172,8 +172,10 @@ private:
 	UFUNCTION()
 		void OnRep_Health();
 
+	UPROPERTY()
 	class ABlastPlayerController* BlastPlayerController;
 
+	UPROPERTY()
 	class ABlasterPlayerState* BlasterplayerState;
 
 public:
