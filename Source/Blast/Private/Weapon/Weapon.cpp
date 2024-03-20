@@ -83,44 +83,37 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-// 이건 서버측에서 실행 된 코드로 인해 state가 바뀌면 클라이언트에서 자동으로 불릴 함수
-void AWeapon::OnRep_WeaponState()
-{
-	switch (WeaponState)
-	{
-	case EWeaponState::EWS_Equipped:
-		ShowPickupWidget(false);
-		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		WeaponMesh->SetSimulatePhysics(false);
-		WeaponMesh->SetEnableGravity(false);
-		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		break;
 
-	case EWeaponState::EWS_Dropped:
-		WeaponMesh->SetSimulatePhysics(true);
-		WeaponMesh->SetEnableGravity(true);
-		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		break;
+
+void AWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	if (Owner == nullptr)
+	{
+		BlasterOwnerCharacter = nullptr;
+		BlasterOwnerController = nullptr;
+
+	}
+	else
+	{
+		SetAmmoHUD();
 	}
 }
 
 void AWeapon::OnRep_Ammo()
 {
-	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
-	if (BlasterOwnerCharacter)
-	{
-		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlastPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
-		if (BlasterOwnerController)
-		{
-			BlasterOwnerController->SetEquipAmmoHUD(Ammo);
-		}
-	}
+	SetAmmoHUD();
 }
 
 void AWeapon::SpendRound()
 {
 	--Ammo;
 
+	SetAmmoHUD();
+}
+
+void AWeapon::SetAmmoHUD()
+{
 	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
 	if (BlasterOwnerCharacter)
 	{
@@ -135,6 +128,7 @@ void AWeapon::SpendRound()
 // 이건 서버 측에서 실행 될 코드
 void AWeapon::SetWeaponState(EWeaponState weaponState)
 {
+
 	WeaponState = weaponState;
 
 	switch (WeaponState)
@@ -160,7 +154,29 @@ void AWeapon::SetWeaponState(EWeaponState weaponState)
 		break;
 
 	}
+}
 
+
+// 이건 서버측에서 실행 된 코드로 인해 state가 바뀌면 클라이언트에서 자동으로 불릴 함수
+void AWeapon::OnRep_WeaponState()
+{
+
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+
+	case EWeaponState::EWS_Dropped:
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		break;
+	}
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -171,6 +187,7 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::ShowPickupWidget(bool bShowWIdget)
 {
+
 	if (PickUpWidget)
 	{
 		PickUpWidget->SetVisibility(bShowWIdget);
@@ -214,6 +231,9 @@ void AWeapon::Dropped()
 
 	FDetachmentTransformRules detachRule(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(detachRule);
+
+	BlasterOwnerCharacter = nullptr;
+	BlasterOwnerController = nullptr;
 }
 
 

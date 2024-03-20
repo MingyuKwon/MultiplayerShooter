@@ -35,6 +35,9 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	void SetAmmoHUD();
+
+
 	// Testures for the weapon crosshair
 
 	UPROPERTY(EditAnyWhere, Category = "CrossHairs")
@@ -71,6 +74,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void OnRep_Owner() override;
+
+
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -105,6 +111,7 @@ private:
 	void OnRep_Ammo();
 
 	void SpendRound();
+
 
 
 	UPROPERTY(EditAnyWhere, Category = "Weapon Properties")

@@ -92,27 +92,27 @@ protected:
 
 private:
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Camera")
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UWidgetComponent* OverheadWidget;
+	class UWidgetComponent* OverheadWidget;
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
-		class AWeapon* OverlappingWeapon;
+	class AWeapon* OverlappingWeapon;
 
 
 	// 이 함수는 replicate 된 경우, 자동 호출 되는 함수이기에, 어떻게 보면 서버 자체는 실행하지 못하는 함수이다
 	UFUNCTION()
-		void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
 	UPROPERTY(VisibleAnyWhere)
-		class UCombatComponent* Combat;
+	class UCombatComponent* Combat;
 
 	UFUNCTION(Server, Reliable)
-		void ServerEquipButtonPressed();
+	void ServerEquipButtonPressed();
 
 
 

@@ -115,9 +115,16 @@ void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 
 void UCombatComponent::OnRep_EquippedWeapon()
 {
+	FString str = FString::Printf(TEXT("OnRep_EquippedWeapon called"));
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, *str);
+
+
 	// 따라서 서버에서 실행 되도록 코드를 짰는데, 그 영향을 받고 싶으면 reply에 넣어야 한다
 	if (EquippedWeapon && Character)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, *str);
+
+
 		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 		const USkeletalMeshSocket* handWeaponSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 		if (handWeaponSocket)
@@ -262,6 +269,11 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 {
 	if (Character == nullptr || WeaponToEquip == nullptr) return;
 
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Dropped();
+	}
+
 	EquippedWeapon = WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 	const USkeletalMeshSocket* handWeaponSocket =  Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
@@ -271,6 +283,7 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 	}
 
 	EquippedWeapon->SetOwner(Character);
+	EquippedWeapon->SetAmmoHUD();
 
 	// 여기서 회전 방식을 바꿨을 떄는, SetEquipWeapon이 오로지 서버에서만 실행이 되기 떄문에 클라에는 적용이 안된다
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
