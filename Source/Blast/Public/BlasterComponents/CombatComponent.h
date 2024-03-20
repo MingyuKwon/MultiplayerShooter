@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "HUD/BlasterHUD.h"
+#include "Blast/BlasterTypes/CombatState.h"
+
 #include "Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
@@ -38,6 +40,8 @@ public:
 
 	void Reload();
 
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
 
 	FORCEINLINE FVector GetHitTarget() { return HitTarget; }
 
@@ -65,6 +69,7 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
 
+	void HandleReload();
 
 	void SetHUDCrosshairs(float DeltaTime);
 
@@ -138,4 +143,9 @@ private:
 
 	void InitializeCarriedAmmo();
 
+	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	ECombatState CombatState = ECombatState::ECS_Unoccupied;
+
+	UFUNCTION()
+	void OnRep_CombatState();
 };
