@@ -115,4 +115,6 @@ private:
 
 	FHUDPackage HUDPackage;
 
+	bool CanFire();
+
 };

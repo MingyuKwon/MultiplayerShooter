@@ -219,6 +219,13 @@ void UCombatComponent::FireTimerFinished()
 	}
 }
 
+bool UCombatComponent::CanFire()
+{
+	if (EquippedWeapon == nullptr) return false;
+
+	return !EquippedWeapon->IsAmmoEmpty() && bCanFire;
+}
+
 
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
@@ -234,7 +241,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 }
 void UCombatComponent::Fire()
 {
-	if (bCanFire)
+	if (CanFire())
 	{
 		bCanFire = false;
 		ServerFire(HitTarget);
