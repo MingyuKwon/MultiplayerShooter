@@ -222,6 +222,11 @@ void UCombatComponent::FireTimerFinished()
 	{
 		Fire();
 	}
+
+	if (EquippedWeapon->IsAmmoEmpty())
+	{
+		Reload();
+	}
 }
 
 bool UCombatComponent::CanFire()
@@ -414,6 +419,11 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 	}
 
 	EquippedWeapon->PlayEquipSound();
+
+	if (EquippedWeapon->IsAmmoEmpty())
+	{
+		Reload();
+	}
 
 	// 여기서 회전 방식을 바꿨을 떄는, SetEquipWeapon이 오로지 서버에서만 실행이 되기 떄문에 클라에는 적용이 안된다
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
