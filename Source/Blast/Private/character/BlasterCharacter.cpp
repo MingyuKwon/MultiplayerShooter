@@ -16,6 +16,7 @@
 #include "Controller/BlastPlayerController.h"
 #include "GameMode/BlasterGameMode.h"
 #include "TimerManager.h"
+#include "Weapon/WeaponTypes.h"
 #include "PlayerState/BlasterPlayerState.h"
 
 ABlasterCharacter::ABlasterCharacter()
@@ -88,6 +89,30 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	{
 		animInstance->Montage_Play(FireWeaponMontage);
 		FName SectionName = bAiming ? FName("RifleHip") : FName("RifleAim");
+		animInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void ABlasterCharacter::PlayReloadMontage()
+{
+	if (Combat == nullptr) return;
+	if (Combat->EquippedWeapon == nullptr) return;
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && ReloadMontage)
+	{
+		animInstance->Montage_Play(ReloadMontage);
+		FName SectionName;
+
+		switch (Combat->EquippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_AssaultRifle :
+			SectionName = FName("Rifle");
+			break;
+
+
+		}
+
 		animInstance->Montage_JumpToSection(SectionName);
 	}
 }
@@ -245,6 +270,9 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction(FName("Fire"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::FireButtonPressed);
 	PlayerInputComponent->BindAction(FName("Fire"), EInputEvent::IE_Released, this, &ABlasterCharacter::FireButtonReleased);
 
+	PlayerInputComponent->BindAction(FName("Reload"), EInputEvent::IE_Pressed, this, &ABlasterCharacter::ReloadButtonPressed);
+
+	
 
 	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ABlasterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(FName("MoveRight"), this, &ABlasterCharacter::MoveRight);
@@ -352,6 +380,14 @@ void ABlasterCharacter::FireButtonReleased()
 	if (Combat)
 	{
 		Combat->FireButtonPressed(false);
+	}
+}
+
+void ABlasterCharacter::ReloadButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->Reload();
 	}
 }
 

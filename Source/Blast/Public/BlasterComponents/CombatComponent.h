@@ -36,6 +36,9 @@ public:
 
 	void Fire();
 
+	void Reload();
+
+
 	FORCEINLINE FVector GetHitTarget() { return HitTarget; }
 
 
@@ -58,6 +61,9 @@ protected:
 	void MultiCastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrossHair(FHitResult& OutResult);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
 
 
 	void SetHUDCrosshairs(float DeltaTime);
