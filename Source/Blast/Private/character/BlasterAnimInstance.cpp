@@ -40,6 +40,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bRotateRootBone = BlasterCharacter->ShouldRotateRootBone();
 	bLocallyControlled = BlasterCharacter->IsLocallyControlled();
 	bElimed = BlasterCharacter->IsElimed();
+	bUseAimOffset = BlasterCharacter->GetCombatState() != ECombatState::ECS_Reloading;
 
 	// offset yaw for strafing
 
@@ -75,4 +76,5 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		}
 
 	}
+
 }

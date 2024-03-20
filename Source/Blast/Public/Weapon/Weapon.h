@@ -39,6 +39,8 @@ public:
 	
 	void AddAmmo(int32 AddAmmo);
 
+	void PlayEquipSound();
+
 	void SetAmmoHUD();
 
 
@@ -101,6 +103,10 @@ private:
 
 	UPROPERTY(EditAnyWhere, Category = "Weapon Properties")
 	class UWidgetComponent* PickUpWidget;
+
+	UPROPERTY(EditAnyWhere, Category = "Sound")
+	class USoundCue* EquipSound;
+
 
 	UFUNCTION()
 	void OnRep_WeaponState();

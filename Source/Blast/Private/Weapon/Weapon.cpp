@@ -8,9 +8,10 @@
 #include "Net/UnrealNetwork.h"
 #include "Animation/AnimationAsset.h"
 #include "Weapon/Casing.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Controller/BlastPlayerController.h"
-
+#include "Sound/SoundCue.h"
 
 
 AWeapon::AWeapon()
@@ -47,6 +48,14 @@ void AWeapon::AddAmmo(int32 AddAmmo)
 {
 	Ammo = FMath::Clamp(Ammo + AddAmmo, 0, MagCapacity);
 	SetAmmoHUD();
+}
+
+void AWeapon::PlayEquipSound()
+{
+	if (EquipSound) 
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, EquipSound, GetActorLocation());
+	}
 }
 
 void AWeapon::BeginPlay()
