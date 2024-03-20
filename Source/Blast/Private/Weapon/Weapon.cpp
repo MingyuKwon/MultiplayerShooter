@@ -9,6 +9,7 @@
 #include "Animation/AnimationAsset.h"
 #include "Weapon/Casing.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Controller/BlastPlayerController.h"
 
 
 
@@ -38,7 +39,8 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AWeapon, WeaponState)
+	DOREPLIFETIME(AWeapon, WeaponState);
+	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::BeginPlay()
@@ -99,6 +101,34 @@ void AWeapon::OnRep_WeaponState()
 		WeaponMesh->SetEnableGravity(true);
 		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
+	}
+}
+
+void AWeapon::OnRep_Ammo()
+{
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if (BlasterOwnerCharacter)
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlastPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+		if (BlasterOwnerController)
+		{
+			BlasterOwnerController->SetEquipAmmoHUD(Ammo);
+		}
+	}
+}
+
+void AWeapon::SpendRound()
+{
+	--Ammo;
+
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if (BlasterOwnerCharacter)
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlastPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+		if (BlasterOwnerController)
+		{
+			BlasterOwnerController->SetEquipAmmoHUD(Ammo);
+		}
 	}
 }
 
@@ -173,6 +203,8 @@ void AWeapon::Fire(const FVector& hitTarget)
 			}
 		}
 	}
+
+	SpendRound();
 }
 
 void AWeapon::Dropped()

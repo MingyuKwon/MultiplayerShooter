@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "character/BlasterCharacter.h"
 #include "PlayerState/BlasterPlayerState.h"
+#include "character/BlasterCharacter.h"
 #include "Controller/BlastPlayerController.h"
 #include "Net/UnrealNetwork.h"
 

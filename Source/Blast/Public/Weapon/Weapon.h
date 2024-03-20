@@ -94,14 +94,28 @@ private:
 	UFUNCTION()
 	void OnRep_WeaponState();
 
+
+	UPROPERTY(EditAnyWhere, ReplicatedUsing = OnRep_WeaponState, Category = "Weapon ammo")
+	int32 Ammo;
+
+	UPROPERTY(EditAnyWhere, Category = "Weapon ammo")
+	int32 MagCapacity;
+
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpendRound();
+
+
 	UPROPERTY(EditAnyWhere, Category = "Weapon Properties")
 	class UAnimationAsset* FireAnimation;
-
 
 	UPROPERTY(EditAnyWhere, Category = "Weapon Properties")
 	TSubclassOf<class ACasing> CasingClass;
 
 
+	class ABlasterCharacter* BlasterOwnerCharacter;
+	class ABlastPlayerController* BlasterOwnerController;
 
 
 public:

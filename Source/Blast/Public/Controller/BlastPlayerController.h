@@ -19,6 +19,7 @@ public:
 	void SetScoreHUD(float Score);
 	void SetDefeatHUD(int32 Defeats);
 
+	void SetEquipAmmoHUD(int32 Ammo);
 
 protected:
 	virtual void BeginPlay() override;
