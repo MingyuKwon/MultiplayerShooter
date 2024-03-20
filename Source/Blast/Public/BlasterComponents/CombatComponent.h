@@ -71,6 +71,8 @@ protected:
 
 	void HandleReload();
 
+	int32 AmountToReload();
+
 	void SetHUDCrosshairs(float DeltaTime);
 
 private:
@@ -148,4 +150,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_CombatState();
+
+	void UpdateAmmoAmount();
 };

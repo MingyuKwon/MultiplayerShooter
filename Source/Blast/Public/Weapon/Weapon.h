@@ -36,6 +36,8 @@ public:
 	virtual void Dropped();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	void AddAmmo(int32 AddAmmo);
 
 	void SetAmmoHUD();
 
@@ -139,5 +141,7 @@ public:
 	FORCEINLINE float GetZoomedInterpSpeed() const { return ZoomedInterpSpeed; }
 	FORCEINLINE bool IsAmmoEmpty() const { return Ammo <= 0; }
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
+	FORCEINLINE int32 GetAmmo() const { return Ammo; }
+	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; }
 
 };

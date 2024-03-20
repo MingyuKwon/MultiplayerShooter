@@ -43,6 +43,12 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AWeapon, Ammo);
 }
 
+void AWeapon::AddAmmo(int32 AddAmmo)
+{
+	Ammo = FMath::Clamp(Ammo + AddAmmo, 0, MagCapacity);
+	SetAmmoHUD();
+}
+
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
