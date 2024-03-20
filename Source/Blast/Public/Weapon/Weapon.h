@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapon/WeaponTypes.h"
+
 #include "Weapon.generated.h"
 
 UENUM(BlueprintType)
@@ -84,6 +86,7 @@ protected:
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
+
 private:
 	UPROPERTY(VisibleAnyWhere, Category = "Weapon Properties")
 	USkeletalMeshComponent* WeaponMesh;
@@ -124,6 +127,9 @@ private:
 	class ABlasterCharacter* BlasterOwnerCharacter;
 	class ABlastPlayerController* BlasterOwnerController;
 
+	UPROPERTY(EditAnywhere)
+	EWeaponType WeaponType;
+
 
 public:
 	void SetWeaponState(EWeaponState weaponState);
@@ -132,5 +138,6 @@ public:
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
 	FORCEINLINE float GetZoomedInterpSpeed() const { return ZoomedInterpSpeed; }
 	FORCEINLINE bool IsAmmoEmpty() const { return Ammo <= 0; }
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; }
 
 };

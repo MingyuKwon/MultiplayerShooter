@@ -92,3 +92,19 @@ void ABlastPlayerController::SetEquipAmmoHUD(int32 Ammo)
 
 	}
 }
+
+void ABlastPlayerController::SetCarriedAmmoHUD(int32 Ammo)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bAvailable = BlasterHUD
+		&& BlasterHUD->OverlayWidget
+		&& BlasterHUD->OverlayWidget->CarriedAmmoAmount;
+
+	if (bAvailable)
+	{
+		FString AmmoTEXT = FString::Printf(TEXT("%d"), Ammo);
+		BlasterHUD->OverlayWidget->CarriedAmmoAmount->SetText(FText::FromString(AmmoTEXT));
+
+	}
+}

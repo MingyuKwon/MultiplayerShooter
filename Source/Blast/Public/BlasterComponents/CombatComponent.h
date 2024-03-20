@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "HUD/BlasterHUD.h"
+#include "Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 80000
@@ -116,5 +117,19 @@ private:
 	FHUDPackage HUDPackage;
 
 	bool CanFire();
+
+	// carried ammom for current equipped map
+	UPROPERTY(EditAnyWhere, ReplicatedUsing = OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+
+	TMap<EWeaponType, int32> CarriedAmmoMap;
+
+	UPROPERTY(EditAnyWhere)
+	int32 StartingARAmmo = 30;
+
+	void InitializeCarriedAmmo();
 
 };

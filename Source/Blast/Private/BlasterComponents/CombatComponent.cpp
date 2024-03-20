@@ -31,6 +31,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
+	DOREPLIFETIME(UCombatComponent, CarriedAmmo);
 
 }
 
@@ -47,6 +48,11 @@ void UCombatComponent::BeginPlay()
 		{
 			DefaultFOV = Character->GetFollowCamera()->FieldOfView;
 			CurrentFOV = DefaultFOV;
+		}
+
+		if (Character->HasAuthority())
+		{
+			InitializeCarriedAmmo();
 		}
 	}
 }
@@ -226,6 +232,20 @@ bool UCombatComponent::CanFire()
 	return !EquippedWeapon->IsAmmoEmpty() && bCanFire;
 }
 
+void UCombatComponent::OnRep_CarriedAmmo()
+{
+	playerController = playerController == nullptr ? Cast<ABlastPlayerController>(Character->Controller) : playerController;
+	if (playerController)
+	{
+		playerController->SetCarriedAmmoHUD(CarriedAmmo);
+	}
+}
+
+void UCombatComponent::InitializeCarriedAmmo()
+{
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_AssaultRifle, StartingARAmmo);
+}
+
 
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
@@ -291,6 +311,17 @@ void UCombatComponent::SetEquipWeapon(AWeapon* WeaponToEquip)
 
 	EquippedWeapon->SetOwner(Character);
 	EquippedWeapon->SetAmmoHUD();
+	
+	if (CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+
+	playerController = playerController == nullptr ? Cast<ABlastPlayerController>(Character->Controller) : playerController;
+	if (playerController)
+	{
+		playerController->SetCarriedAmmoHUD(CarriedAmmo);
+	}
 
 	// 여기서 회전 방식을 바꿨을 떄는, SetEquipWeapon이 오로지 서버에서만 실행이 되기 떄문에 클라에는 적용이 안된다
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
