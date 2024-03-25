@@ -30,6 +30,7 @@ public:
 
 	float CrosshairSpread;
 	FLinearColor CrosshairsColor;
+
 };
 
 /**
@@ -48,6 +49,9 @@ public:
 
 	class UCharacterOverlayWidget* OverlayWidget;
 
+	void AddCharacterOverlay();
+
+
 private:
 	FHUDPackage HUDPackage;
 
@@ -58,7 +62,6 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
-	void AddCharacterOverlay();
 
 public:
 	FORCEINLINE void SetHUDPackage(const FHUDPackage& package) {HUDPackage = package;}

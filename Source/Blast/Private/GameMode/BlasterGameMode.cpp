@@ -34,6 +34,22 @@ void ABlasterGameMode::BeginPlay()
 	LevelStartTime = GetWorld()->GetTimeSeconds();
 }
 
+void ABlasterGameMode::OnMatchStateSet()
+{
+	Super::OnMatchStateSet();
+
+	for (FConstPlayerControllerIterator IT = GetWorld()->GetPlayerControllerIterator(); IT; IT++)
+	{
+		ABlastPlayerController* playerController = Cast<ABlastPlayerController>(*IT);
+		if (playerController)
+		{
+			playerController->OnMatchStateSet(MatchState);
+		}
+	}
+\
+	
+}
+
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* eliminatedCharacter, ABlastPlayerController* killingController, ABlastPlayerController* killedController)
 {
 	ABlasterPlayerState* KillerPlayerstate = killingController ? Cast<ABlasterPlayerState>(killingController->PlayerState) : nullptr;

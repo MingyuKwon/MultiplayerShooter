@@ -28,6 +28,8 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 
+	virtual void OnMatchStateSet() override;
+
 private:
 
 	float LevelStartTime = 0.f;

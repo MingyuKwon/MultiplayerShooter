@@ -7,11 +7,20 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "character/BlasterCharacter.h"
+#include "Net/UnrealNetwork.h"
+#include "GameMode/BlasterGameMode.h"
 
 void ABlastPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+}
+
+void ABlastPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABlastPlayerController, MatchState);
 }
 
 void ABlastPlayerController::OnPossess(APawn* pawn)
@@ -32,7 +41,9 @@ void ABlastPlayerController::Tick(float DeltaTime)
 	SetHudTime();
 
 	CheckTimeSync(DeltaTime);
+	PollInit();
 }
+
 
 void ABlastPlayerController::CheckTimeSync(float DeltaTime)
 {
@@ -71,6 +82,8 @@ void ABlastPlayerController::ReceivedPlayer()
 	}
 }
 
+
+
 void ABlastPlayerController::ServerRequestServerTime_Implementation(float TimeofClientRequest)
 {
 	float ServerTime = GetWorld()->GetTimeSeconds();
@@ -84,6 +97,24 @@ void ABlastPlayerController::ClientReportServerTime_Implementation(float TimeofC
 	float CurrentServerTime = TimeServerReceiveClientRequest + RTT * 0.5;
 
 	ClientServerDelta = CurrentServerTime - ClientTime;
+}
+
+void ABlastPlayerController::PollInit()
+{
+	if (CharacterOverlay == nullptr)
+	{
+		if (BlasterHUD && BlasterHUD->OverlayWidget)
+		{
+			CharacterOverlay = BlasterHUD->OverlayWidget;
+
+			if (CharacterOverlay)
+			{
+				SetHealthHUD(HUDHealth, HUDMaxHealth);
+				SetScoreHUD(HUDScore);
+				SetDefeatHUD(HUDDefeat);
+			}
+		}
+	}
 }
 
 void ABlastPlayerController::SetHealthHUD(float Health, float MaxHealth)
@@ -104,6 +135,11 @@ void ABlastPlayerController::SetHealthHUD(float Health, float MaxHealth)
 		BlasterHUD->OverlayWidget->HealthText->SetText(FText::FromString(healthTEXT));
 
 	}
+	else
+	{
+		HUDHealth = Health;
+		HUDMaxHealth = MaxHealth;
+	}
 }
 
 void ABlastPlayerController::SetScoreHUD(float Score)
@@ -118,6 +154,10 @@ void ABlastPlayerController::SetScoreHUD(float Score)
 	{
 		FString ScoreTEXT = FString::Printf(TEXT("%d"), FMath::CeilToInt32(Score));
 		BlasterHUD->OverlayWidget->ScoreAmount->SetText(FText::FromString(ScoreTEXT));
+	}
+	else
+	{
+		HUDScore = Score;
 	}
 
 }
@@ -134,6 +174,10 @@ void ABlastPlayerController::SetDefeatHUD(int32 Defeats)
 	{
 		FString DefeatTEXT = FString::Printf(TEXT("%d"), Defeats);
 		BlasterHUD->OverlayWidget->DefeatAmount->SetText(FText::FromString(DefeatTEXT));
+	}
+	else
+	{
+		HUDDefeat = Defeats;
 	}
 }
 
@@ -153,6 +197,7 @@ void ABlastPlayerController::SetMatchTimeHUD(float CountDownTime)
 		FString TimeTEXT = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
 		BlasterHUD->OverlayWidget->MatchCountdownText->SetText(FText::FromString(TimeTEXT));
 	}
+
 }
 
 void ABlastPlayerController::SetEquipAmmoHUD(int32 Ammo)
@@ -169,6 +214,7 @@ void ABlastPlayerController::SetEquipAmmoHUD(int32 Ammo)
 		BlasterHUD->OverlayWidget->WeaponAmmoAmount->SetText(FText::FromString(AmmoTEXT));
 
 	}
+
 }
 
 void ABlastPlayerController::SetCarriedAmmoHUD(int32 Ammo)
@@ -184,5 +230,31 @@ void ABlastPlayerController::SetCarriedAmmoHUD(int32 Ammo)
 		FString AmmoTEXT = FString::Printf(TEXT("%d"), Ammo);
 		BlasterHUD->OverlayWidget->CarriedAmmoAmount->SetText(FText::FromString(AmmoTEXT));
 
+	}
+}
+
+void ABlastPlayerController::OnMatchStateSet(FName State)
+{
+	MatchState = State;
+
+	if (MatchState == MatchState::InProgress)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+		if (BlasterHUD)
+		{
+			BlasterHUD->AddCharacterOverlay();
+		}
+	}
+}
+
+void ABlastPlayerController::OnRep_MatchState()
+{
+	if (MatchState == MatchState::InProgress)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+		if (BlasterHUD)
+		{
+			BlasterHUD->AddCharacterOverlay();
+		}
 	}
 }
