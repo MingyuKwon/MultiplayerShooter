@@ -24,6 +24,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float WarmupTime = 10.f;
 
+	UPROPERTY(EditAnywhere)
+	float MatchTime = 120.f;
+
+	float LevelStartTime = 0.f;
+
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
@@ -32,6 +38,5 @@ protected:
 
 private:
 
-	float LevelStartTime = 0.f;
 	float CountdownTime = 10.f;
 };
