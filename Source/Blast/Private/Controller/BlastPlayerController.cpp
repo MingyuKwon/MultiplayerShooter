@@ -9,11 +9,18 @@
 #include "character/BlasterCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "GameMode/BlasterGameMode.h"
+#include "HUD/Announcement.h"
 
 void ABlastPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+
+	// 따라서 여기에 hud 를 참조해서 addAnnouncement를 하는 것이 가장 좋다
+	if (BlasterHUD)
+	{
+		BlasterHUD->AddAnnouncement();
+	}
 }
 
 void ABlastPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -237,24 +244,32 @@ void ABlastPlayerController::OnMatchStateSet(FName State)
 {
 	MatchState = State;
 
+	// 여기서 하기에는 waitingstart 차례에는 hud가 존재 하지 않아서 add 하려고 해도 무조건 튕긴다
+
 	if (MatchState == MatchState::InProgress)
 	{
-		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if (BlasterHUD)
-		{
-			BlasterHUD->AddCharacterOverlay();
-		}
+		HandleMatchState();
 	}
 }
 
 void ABlastPlayerController::OnRep_MatchState()
 {
+
 	if (MatchState == MatchState::InProgress)
 	{
-		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if (BlasterHUD)
+		HandleMatchState();
+	}
+}
+
+void ABlastPlayerController::HandleMatchState()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD)
+	{
+		BlasterHUD->AddCharacterOverlay();
+		if (BlasterHUD->AnnouncementWidget)
 		{
-			BlasterHUD->AddCharacterOverlay();
+			BlasterHUD->AnnouncementWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

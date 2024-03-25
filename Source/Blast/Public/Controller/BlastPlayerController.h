@@ -71,6 +71,8 @@ private:
 	UFUNCTION()
 	void OnRep_MatchState();
 
+	void HandleMatchState();
+
 
 	UPROPERTY()
 	class UCharacterOverlayWidget* CharacterOverlay;
