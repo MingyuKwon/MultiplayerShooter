@@ -9,6 +9,13 @@
 /**
  * 
  */
+
+// custom matchstate
+namespace MatchState
+{
+	extern BLAST_API const FName CoolDown;
+}
+
 UCLASS()
 class BLAST_API ABlasterGameMode : public AGameMode
 {
@@ -23,6 +30,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float WarmupTime = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	float CooldownTime = 10.f;
+
 
 	UPROPERTY(EditAnywhere)
 	float MatchTime = 120.f;

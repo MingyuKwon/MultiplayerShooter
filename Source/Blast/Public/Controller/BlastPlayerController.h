@@ -31,6 +31,11 @@ public:
 	void OnMatchStateSet(FName State);
 
 
+	void HandleMatchStart();
+
+	void HandleCooldown();
+
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -83,7 +88,6 @@ private:
 	UFUNCTION()
 	void OnRep_MatchState();
 
-	void HandleMatchState();
 
 
 	UPROPERTY()

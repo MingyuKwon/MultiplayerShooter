@@ -321,7 +321,11 @@ void ABlastPlayerController::OnMatchStateSet(FName State)
 
 	if (MatchState == MatchState::InProgress)
 	{
-		HandleMatchState();
+		HandleMatchStart();
+	}
+	else if (MatchState == MatchState::CoolDown)
+	{
+		HandleCooldown();
 	}
 }
 
@@ -330,19 +334,36 @@ void ABlastPlayerController::OnRep_MatchState()
 
 	if (MatchState == MatchState::InProgress)
 	{
-		HandleMatchState();
+		HandleMatchStart();
+	}
+	else if (MatchState == MatchState::CoolDown)
+	{
+		HandleCooldown();
 	}
 }
 
-void ABlastPlayerController::HandleMatchState()
+void ABlastPlayerController::HandleMatchStart()
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 	if (BlasterHUD)
 	{
 		BlasterHUD->AddCharacterOverlay();
+
 		if (BlasterHUD->AnnouncementWidget)
 		{
 			BlasterHUD->AnnouncementWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void ABlastPlayerController::HandleCooldown()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD)
+	{
+		if (BlasterHUD->AnnouncementWidget)
+		{
+			BlasterHUD->AnnouncementWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 }
