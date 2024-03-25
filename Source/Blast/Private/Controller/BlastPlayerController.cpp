@@ -26,6 +26,24 @@ void ABlastPlayerController::OnPossess(APawn* pawn)
 	
 }
 
+void ABlastPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void ABlastPlayerController::SetHudTime()
+{
+	uint32 timeLeft = FMath::CeilToInt(MatcthTime - GetWorld()->GetTimeSeconds());
+
+	if (timeLeft != countDownInt)
+	{
+		SetMatchTimeHUD(timeLeft);
+	}
+
+	countDownInt = timeLeft;
+
+}
+
 void ABlastPlayerController::SetHealthHUD(float Health, float MaxHealth)
 {
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
@@ -74,6 +92,24 @@ void ABlastPlayerController::SetDefeatHUD(int32 Defeats)
 	{
 		FString DefeatTEXT = FString::Printf(TEXT("%d"), Defeats);
 		BlasterHUD->OverlayWidget->DefeatAmount->SetText(FText::FromString(DefeatTEXT));
+	}
+}
+
+void ABlastPlayerController::SetMatchTimeHUD(float CountDownTime)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	bool bAvailable = BlasterHUD
+		&& BlasterHUD->OverlayWidget
+		&& BlasterHUD->OverlayWidget->MatchCountdownText;
+
+	if (bAvailable)
+	{
+
+		int32 Minutes = FMath::FloorToInt(CountDownTime / 60.f);
+		int32 Seconds = CountDownTime - Minutes * 60.f;
+		FString TimeTEXT = FString::Printf(TEXT("%02d::%02d"), Minutes, Seconds);
+		BlasterHUD->OverlayWidget->MatchCountdownText->SetText(FText::FromString(TimeTEXT));
 	}
 }
 

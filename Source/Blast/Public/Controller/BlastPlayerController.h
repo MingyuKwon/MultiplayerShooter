@@ -18,6 +18,7 @@ public:
 	void SetHealthHUD(float Health, float MaxHealth);
 	void SetScoreHUD(float Score);
 	void SetDefeatHUD(int32 Defeats);
+	void SetMatchTimeHUD(float CountDownTime);
 
 
 	void SetEquipAmmoHUD(int32 Ammo);
@@ -26,8 +27,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* pawn) override;
+	virtual void Tick(float DeltaTime) override;
 
+	void SetHudTime();
 
 private:
 	class ABlasterHUD* BlasterHUD;
+
+	float MatcthTime = 120.f;
+	uint32 countDownInt = 0;
 };
