@@ -8,6 +8,32 @@
 #include "GameFramework/PlayerStart.h"
 #include "PlayerState/BlasterPlayerState.h"
 
+ABlasterGameMode::ABlasterGameMode()
+{
+	bDelayedStart = true;
+}
+
+void ABlasterGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (MatchState == MatchState::WaitingToStart)
+	{
+		CountdownTime = WarmupTime - GetWorld()->GetTimeSeconds() + LevelStartTime;
+		if (CountdownTime <= 0.f)
+		{
+			StartMatch();
+		}
+	}
+}
+
+void ABlasterGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	LevelStartTime = GetWorld()->GetTimeSeconds();
+}
+
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* eliminatedCharacter, ABlastPlayerController* killingController, ABlastPlayerController* killedController)
 {
 	ABlasterPlayerState* KillerPlayerstate = killingController ? Cast<ABlasterPlayerState>(killingController->PlayerState) : nullptr;
@@ -46,3 +72,5 @@ void ABlasterGameMode::RequestRespawn(ACharacter* ElimCharacter, AController* El
 		RestartPlayerAtPlayerStart(ElimController, actorArray[Selection]);
 	}
 }
+
+
