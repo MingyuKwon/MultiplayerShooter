@@ -11,6 +11,7 @@
 #include "GameMode/BlasterGameMode.h"
 #include "HUD/Announcement.h"
 #include "Kismet/GameplayStatics.h"
+#include "BlasterComponents/CombatComponent.h"
 
 void ABlastPlayerController::BeginPlay()
 {
@@ -397,9 +398,16 @@ void ABlastPlayerController::HandleCooldown()
 
 			FString AnnouncementText("New Game Start In :");
 			BlasterHUD->AnnouncementWidget->AnnouncementText->SetText(FText::FromString(AnnouncementText));
-
 			BlasterHUD->AnnouncementWidget->AnnouncementInfo->SetText(FText());
 
 		}
 	}
+
+	ABlasterCharacter* blasterCharacter = Cast<ABlasterCharacter>(GetPawn());
+	if (blasterCharacter && blasterCharacter->GetCombatComponent())
+	{
+		blasterCharacter->bDisableGameplay = true;
+		blasterCharacter->GetCombatComponent()->FireButtonPressed(false);
+	}
+
 }

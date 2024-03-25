@@ -32,6 +32,9 @@ public:
 
 	void Elim();
 
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
+
 
 	virtual void OnRep_ReplicatedMovement() override;
 protected:
@@ -40,6 +43,8 @@ protected:
 	void UpdateHUDHealth();
 
 	virtual void Tick(float DeltaTime) override;
+
+	void RotateInPlace(float DeltaTime);
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -205,5 +210,8 @@ public:
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	ECombatState GetCombatState() const;
+	FORCEINLINE UCombatComponent* GetCombatComponent() const { return Combat; }
+	FORCEINLINE bool GetGameplayDisable() const { return bDisableGameplay; }
+
 
 };
