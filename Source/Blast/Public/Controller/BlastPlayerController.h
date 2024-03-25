@@ -57,7 +57,7 @@ protected:
 	void ServerCheckMatchState();
 
 	UFUNCTION(Client, Reliable)
-	void ClientJoinMidGame(FName StateOfMatch, float match, float warmup, float levelstarting);
+	void ClientJoinMidGame(FName StateOfMatch, float match, float cooldown, float warmup, float levelstarting);
 
 
 	float ClientServerDelta = 0.f;
@@ -73,11 +73,16 @@ protected:
 
 
 private:
+	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;
+	UPROPERTY()
+	class ABlasterGameMode* BlasterGameMode;
+
 
 	float MatcthTime = 0.f;
 	float WarmupTime = 0.f;
 	float LevelStartingTime = 0.f;
+	float cooldownTime = 0.f;
 
 
 	uint32 countDownInt = 0;
