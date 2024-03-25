@@ -31,9 +31,28 @@ protected:
 
 	void SetHudTime();
 
+	UFUNCTION(Server, Reliable)
+	void ServerRequestServerTime(float TimeofClientRequest);
+
+	UFUNCTION(Client, Reliable)
+	void ClientReportServerTime(float TimeofClientRequest, float TimeServerReceiveClientRequest);
+
+	float ClientServerDelta = 0.f;
+
+	UPROPERTY(EditAnyWhere, Category = "Time")
+	float TimeSyncFrequenty = 5.f;
+	float TimeSyncRunningTime = 0.f;
+
+	void CheckTimeSync(float DeltaTime);
+
+	virtual float GetServerTime();
+	virtual void ReceivedPlayer() override;
+
 private:
 	class ABlasterHUD* BlasterHUD;
 
 	float MatcthTime = 120.f;
 	uint32 countDownInt = 0;
+
+
 };

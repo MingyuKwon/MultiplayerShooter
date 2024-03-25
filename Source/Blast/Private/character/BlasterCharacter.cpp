@@ -622,10 +622,6 @@ void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 
 	OverlappingWeapon = Weapon;
 
-	FString str1 = FString::Printf(TEXT("OverlappingWeapon null is %s"), OverlappingWeapon == nullptr ? *FString("True") : *FString("False"));
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, *str1);
-
-
 	if (IsLocallyControlled())
 	{
 		if (OverlappingWeapon)

@@ -29,11 +29,24 @@ void ABlastPlayerController::OnPossess(APawn* pawn)
 void ABlastPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	SetHudTime();
+
+	CheckTimeSync(DeltaTime);
+}
+
+void ABlastPlayerController::CheckTimeSync(float DeltaTime)
+{
+	TimeSyncRunningTime += DeltaTime;
+	if (IsLocalController() && TimeSyncRunningTime > TimeSyncFrequenty)
+	{
+		TimeSyncRunningTime = 0.f;
+		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
+	}
 }
 
 void ABlastPlayerController::SetHudTime()
 {
-	uint32 timeLeft = FMath::CeilToInt(MatcthTime - GetWorld()->GetTimeSeconds());
+	uint32 timeLeft = FMath::CeilToInt(MatcthTime - GetServerTime());
 
 	if (timeLeft != countDownInt)
 	{
@@ -42,6 +55,35 @@ void ABlastPlayerController::SetHudTime()
 
 	countDownInt = timeLeft;
 
+}
+
+float ABlastPlayerController::GetServerTime()
+{
+	return GetWorld()->GetTimeSeconds() + ClientServerDelta;
+}
+
+void ABlastPlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+	if (IsLocalController())
+	{
+		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
+	}
+}
+
+void ABlastPlayerController::ServerRequestServerTime_Implementation(float TimeofClientRequest)
+{
+	float ServerTime = GetWorld()->GetTimeSeconds();
+	ClientReportServerTime(TimeofClientRequest, ServerTime);
+}
+
+void ABlastPlayerController::ClientReportServerTime_Implementation(float TimeofClientRequest, float TimeServerReceiveClientRequest)
+{
+	float ClientTime = GetWorld()->GetTimeSeconds();
+	float RTT = ClientTime - TimeofClientRequest;
+	float CurrentServerTime = TimeServerReceiveClientRequest + RTT * 0.5;
+
+	ClientServerDelta = CurrentServerTime - ClientTime;
 }
 
 void ABlastPlayerController::SetHealthHUD(float Health, float MaxHealth)
@@ -108,7 +150,7 @@ void ABlastPlayerController::SetMatchTimeHUD(float CountDownTime)
 
 		int32 Minutes = FMath::FloorToInt(CountDownTime / 60.f);
 		int32 Seconds = CountDownTime - Minutes * 60.f;
-		FString TimeTEXT = FString::Printf(TEXT("%02d::%02d"), Minutes, Seconds);
+		FString TimeTEXT = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
 		BlasterHUD->OverlayWidget->MatchCountdownText->SetText(FText::FromString(TimeTEXT));
 	}
 }
