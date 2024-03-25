@@ -28,7 +28,7 @@ public:
 	void PlayElimMontage();
 
 	UFUNCTION(NetMulticast, Reliable)
-		void MulticastElim();
+	void MulticastElim();
 
 	void Elim();
 
