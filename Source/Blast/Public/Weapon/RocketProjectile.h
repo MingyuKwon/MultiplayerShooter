@@ -25,6 +25,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* RocketMesh;
 
+	UPROPERTY(VisibleAnywhere)
+	class URocketMovementComponent* RocketMovementComponent;
+
+
 	UPROPERTY(EditAnywhere)
 	class USoundCue* ProjectileLoop;
 
@@ -33,5 +37,6 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	class USoundAttenuation* LoopSoundAttenuation;
+
 
 };

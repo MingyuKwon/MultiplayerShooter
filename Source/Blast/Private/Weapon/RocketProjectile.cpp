@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include "Weapon/RocketMovementComponent.h"
 
 
 
@@ -13,6 +14,10 @@ ARocketProjectile::ARocketProjectile()
 	RocketMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Skeletal Mesh"));
 	RocketMesh->SetupAttachment(RootComponent);
 	RocketMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	RocketMovementComponent = CreateDefaultSubobject<URocketMovementComponent>(FName("Rocket move Component"));
+	RocketMovementComponent->bRotationFollowsVelocity = true;
+	RocketMovementComponent->SetIsReplicated(true);
 }
 
 void ARocketProjectile::BeginPlay()
@@ -40,6 +45,8 @@ void ARocketProjectile::BeginPlay()
 
 void ARocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit)
 {
+	if (GetOwner() == otherActor) return;
+
 	APawn* instigator = GetInstigator();
 
 	if (instigator)

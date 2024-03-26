@@ -26,13 +26,14 @@ protected:
 	UPROPERTY(EditAnyWhere)
 	float Damage = 20.f;
 
+	UPROPERTY(VisibleAnyWhere)
+		class UProjectileMovementComponent* ProjectileMovementComponent;
+
 
 private:
 	UPROPERTY(EditAnyWhere)
 	class UBoxComponent* CollisionBox;
 
-	UPROPERTY(VisibleAnyWhere)
-	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	UPROPERTY(EditAnyWhere)
 	UParticleSystem* Trace;
