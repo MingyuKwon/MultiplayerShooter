@@ -28,6 +28,8 @@ void AHitScanWeapon::Fire(const FVector& hitTarget)
 		FHitResult FireHit;
 		UWorld* world = GetWorld();
 
+		DrawDebugLine(world, Start, End, FColor::Red, false);
+
 		if (world)
 		{
 			world->LineTraceSingleByChannel(

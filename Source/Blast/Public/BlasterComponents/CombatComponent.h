@@ -149,6 +149,10 @@ private:
 	UPROPERTY(EditAnyWhere)
 	int32 StartingPistolAmmo = 20;
 
+	UPROPERTY(EditAnyWhere)
+	int32 StartingSMGAmmo = 60;
+
+
 	void InitializeCarriedAmmo();
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
