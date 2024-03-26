@@ -143,6 +143,9 @@ private:
 	UPROPERTY(EditAnyWhere)
 	int32 StartingARAmmo = 30;
 
+	UPROPERTY(EditAnyWhere)
+	int32 StartingRocketAmmo = 30;
+
 	void InitializeCarriedAmmo();
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
