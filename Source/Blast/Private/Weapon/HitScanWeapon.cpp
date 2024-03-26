@@ -5,6 +5,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "character/BlasterCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 void AHitScanWeapon::Fire(const FVector& hitTarget)
 {
@@ -17,7 +18,7 @@ void AHitScanWeapon::Fire(const FVector& hitTarget)
 
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
 
-	if (MuzzleFlashSocket && InstigatorController)
+	if (MuzzleFlashSocket)
 	{
 		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
 
@@ -36,21 +37,21 @@ void AHitScanWeapon::Fire(const FVector& hitTarget)
 				ECollisionChannel::ECC_Visibility
 			);
 
+			FVector BeamEnd = End;
+
 			if (FireHit.bBlockingHit)
 			{
+				BeamEnd = FireHit.ImpactPoint;
 				ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(FireHit.GetActor());
-				if (BlasterCharacter)
+				if (BlasterCharacter && HasAuthority() && InstigatorController)
 				{
-					if (HasAuthority())
-					{
-						UGameplayStatics::ApplyDamage(
-							BlasterCharacter,
-							Damage,
-							InstigatorController,
-							this,
-							UDamageType::StaticClass()
-						);
-					}
+					UGameplayStatics::ApplyDamage(
+						BlasterCharacter,
+						Damage,
+						InstigatorController,
+						this,
+						UDamageType::StaticClass()
+					);
 					
 				}
 
@@ -62,6 +63,30 @@ void AHitScanWeapon::Fire(const FVector& hitTarget)
 						FireHit.ImpactPoint,
 						FireHit.ImpactNormal.Rotation()
 					);
+				}
+
+				if (ImpactParticle)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(
+						world,
+						ImpactParticle,
+						FireHit.ImpactPoint,
+						FireHit.ImpactNormal.Rotation()
+					);
+				}
+			}
+
+			if (BeamParticle)
+			{
+				UParticleSystemComponent* beamParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(
+					world,
+					BeamParticle,
+					SocketTransform
+				);
+
+				if (beamParticleSystem)
+				{
+					beamParticleSystem->SetVectorParameter(FName("Target"), BeamEnd);
 				}
 			}
 		}
