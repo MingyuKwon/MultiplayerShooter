@@ -17,15 +17,28 @@ class BLAST_API AHitScanWeapon : public AWeapon
 public:
 	virtual void Fire(const FVector& hitTarget) override;
 
-private:
-	
+protected:
 	UPROPERTY(EditAnywhere)
-	float Damage = 10.f;
+		float Damage = 10.f;
 
 	UPROPERTY(EditAnywhere)
-	class UParticleSystem* ImpactParticle;
-	
+		class UParticleSystem* ImpactParticle;
+
 	UPROPERTY(EditAnywhere)
-	class UParticleSystem* BeamParticle;
+		class UParticleSystem* BeamParticle;
+
+	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
+
+private:
+	
+	// Trace end with scater
+	UPROPERTY(EditAnywhere)
+	float DistanceToSphere = 800.f;
+
+	UPROPERTY(EditAnywhere)
+	float SphereRadius = 75.f;
+
+	UPROPERTY(EditAnywhere)
+	bool bUseScatter = false;
 
 };

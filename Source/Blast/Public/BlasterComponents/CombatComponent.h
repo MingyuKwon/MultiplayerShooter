@@ -10,7 +10,6 @@
 #include "Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
-#define TRACE_LENGTH 80000
 
 
 class ABlasterCharacter;
@@ -152,6 +151,8 @@ private:
 	UPROPERTY(EditAnyWhere)
 	int32 StartingSMGAmmo = 60;
 
+	UPROPERTY(EditAnyWhere)
+	int32 StartingShotgunAmmo = 10;
 
 	void InitializeCarriedAmmo();
 
