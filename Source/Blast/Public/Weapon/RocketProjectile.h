@@ -19,8 +19,19 @@ public:
 
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit) override;
+	virtual void BeginPlay() override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* RocketMesh;
+
+	UPROPERTY(EditAnywhere)
+	class USoundCue* ProjectileLoop;
+
+	UPROPERTY(EditAnywhere)
+	UAudioComponent* ProjectileLoopComponent;
+
+	UPROPERTY(EditAnywhere)
+	class USoundAttenuation* LoopSoundAttenuation;
+
 };

@@ -3,6 +3,10 @@
 
 #include "Weapon/RocketProjectile.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
+
+
 
 ARocketProjectile::ARocketProjectile()
 {
@@ -10,6 +14,29 @@ ARocketProjectile::ARocketProjectile()
 	RocketMesh->SetupAttachment(RootComponent);
 	RocketMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
+
+void ARocketProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (ProjectileLoop && LoopSoundAttenuation)
+	{
+		ProjectileLoopComponent = UGameplayStatics::SpawnSoundAttached(
+			ProjectileLoop,
+			GetRootComponent(),
+			FName(),
+			GetActorLocation(),
+			EAttachLocation::KeepWorldPosition,
+			false,
+			1.f,
+			1.f,
+			0.f,
+			LoopSoundAttenuation
+		);
+	}
+}
+
+
 
 void ARocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, UPrimitiveComponent* ohterComp, FVector normalImpulse, const FHitResult& Hit)
 {
@@ -36,5 +63,11 @@ void ARocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* otherActor, 
 		}
 	}
 
+	if (ProjectileLoopComponent && ProjectileLoopComponent->IsPlaying())
+	{
+		ProjectileLoopComponent->Stop();
+	}
+
 	Super::OnHit(HitComp, otherActor, ohterComp, normalImpulse, Hit);
 }
+
