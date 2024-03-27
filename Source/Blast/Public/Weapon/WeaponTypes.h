@@ -10,7 +10,7 @@ enum class EWeaponType
 	EWT_SubMachinegun,
 	EWT_Shotgun,
 	EWT_SniperRifle,
-
+	EWT_GrenadeLauncer,
 
 	EWT_MAX
 };

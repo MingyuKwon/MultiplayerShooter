@@ -157,7 +157,9 @@ private:
 	UPROPERTY(EditAnyWhere)
 	int32 StartingSniperAmmo = 10;
 
-	
+	UPROPERTY(EditAnyWhere)
+	int32 StartingGrenadeLauncerAmmo = 10;
+
 
 	void InitializeCarriedAmmo();
 
