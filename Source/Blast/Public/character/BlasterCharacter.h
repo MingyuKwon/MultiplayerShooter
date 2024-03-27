@@ -35,6 +35,8 @@ public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowSniperShowWidget(bool bShowScope);
 
 	virtual void OnRep_ReplicatedMovement() override;
 protected:

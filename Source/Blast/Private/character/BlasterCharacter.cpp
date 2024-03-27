@@ -588,6 +588,11 @@ void ABlasterCharacter::MulticastElim_Implementation()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	if (IsLocallyControlled() && Combat && Combat->EquippedWeapon && Combat->bAiming && Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+	{
+		ShowSniperShowWidget(false);
+	}
+
 }
 
 void ABlasterCharacter::ElimTimerFinished()
